@@ -199,13 +199,12 @@ public class LinearRegression implements LinReg {
 
     /**
      * Uses reflection to obtain information from the iDblSrc object, so it is possibly slow.  For time critical cases,
-     * use the other computeScore method that requires
-     * passing in an object that implements the ObjectSource interface; this has signature:- public static
-     * <T extends Enum<T>, U extends Enum<>> double computeScore(MultiKeyCoefficientMap coeffMultiMap,
-     * IDoubleSource iDblSrc, Class<T> enumTypeDouble, ObjectSource iObjSrc, Class<> enumTypeObject)
-     * Requires the first column entry of the MultiKeyCoefficientMap (i.e. the first entry of coeffMultiMap's multiKey)
-     * to be the name of the regressor variables.
-     * The names of the other keys of the coeffMultiMap must match the (case sensitive) name of the corresponding fields
+     * use the other computeScore method that requires passing in an object that implements the ObjectSource interface;
+     * this has signature: {@code public static <T extends Enum<T>, U extends Enum<>> double
+     * computeScore(MultiKeyCoefficientMap coeffMultiMap, IDoubleSource iDblSrc, Class<T> enumTypeDouble, ObjectSource
+     * iObjSrc, Class<> enumTypeObject)} Requires the first column entry of the MultiKeyCoefficientMap (i.e. the first
+     * entry of coeffMultiMap's multiKey) to be the name of the regressor variables.
+     * The names of the other keys of the coeffMultiMap must match the (case-sensitive) name of the corresponding fields
      * of the iDblSrc class.
      *
      * @param coeffMultiMap is a MultiKeyCoefficientMap that has a MultiKey whose first Key is the name of the regressor
@@ -428,10 +427,10 @@ public class LinearRegression implements LinReg {
     /**
      * Requires the implementation of the ObjectSource to ascertain whether any additional conditioning regression
      * keys are used (e.g. whether the underlying agent is female, married etc., where the regression co-efficients
-     * are conditioned on additional keys of gender and civil status, for example).
-     * If the underlying agent does not implement ObjectSource but does have additional conditioning regression keys,
-     * use the computeScore method (that uses reflection, so is slower) with signature:- public static
-     * <T extends Enum<T>> double computeScore(MultiKeyCoefficientMap coeffMultiMap, IDoubleSource iDblSrc, Class<T> enumType)
+     * are conditioned on additional keys of gender and civil status, for example). If the underlying agent does not
+     * implement ObjectSource but does have additional conditioning regression keys, use the computeScore method (that
+     * uses reflection, so is slower) with signature: {@code public static <T extends Enum<T>> double
+     * computeScore(MultiKeyCoefficientMap coeffMultiMap, IDoubleSource iDblSrc, Class<T> enumType)}
      * If the underlying agent does not have additional conditioning regression keys, use the computeScore method with
      * signature:-
      * <p>
@@ -621,8 +620,8 @@ public class LinearRegression implements LinReg {
      * are used (e.g. whether the underlying agent is female, married etc., where the regression co-efficients are
      * conditioned on additional keys of gender and civil status, for example).
      * If the underlying agent does not implement ObjectSource but does have additional conditioning regression keys,
-     * use the computeScore method (that uses reflection, so is slower) with signature:- public static
-     * <T extends Enum<T>> double getScore(IDoubleSource iDblSrc, Class<T> enumType)
+     * use the computeScore method (that uses reflection, so is slower) with signature: {@code public static
+     * <T extends Enum<T>> double getScore(IDoubleSource iDblSrc, Class<T> enumType)}
      * If the underlying agent does not have additional conditioning regression keys, use the computeScore method
      * with signature:-
      *

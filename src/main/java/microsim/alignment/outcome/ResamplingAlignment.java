@@ -25,7 +25,7 @@ import static microsim.statistics.regression.RegressionUtils.event;
  * reached, or the maximum number of attempts to resample has been reached.
  *
  * @implSpec This method is for events with binary outcomes {@code 0, 1} only.
- * @see <a href="https://ideas.repec.org/a/ijm/journl/v7y2014i2p3-39.html">Matteo Richiardi & Ambra Poggi, 2014.
+ * @see <a href="https://ideas.repec.org/a/ijm/journl/v7y2014i2p3-39.html">Matteo Richiardi, Ambra Poggi, 2014.
  * "Imputing Individual Effects in Dynamic Microsimulation Models. An application to household formation and labour
  * market participation in Italy," International Journal of Microsimulation, International Microsimulation Association,
  * vol. 7(2), pages 3-39.</a>

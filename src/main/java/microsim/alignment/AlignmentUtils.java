@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * A generic utility class with methods that are used across the {@link microsim.alignment} module.
  *
- * @param <T>
+ * @param <T> A generic type describing an agent.
  */
 public interface AlignmentUtils<T> {
     /**

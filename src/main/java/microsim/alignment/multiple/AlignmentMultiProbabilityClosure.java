@@ -6,7 +6,7 @@ import lombok.NonNull;
 /**
  * A general interface for alignment procedures with multiple outcomes.
  *
- * @param <T>
+ * @param <T> A generic type describing an agent.
  */
 
 public interface AlignmentMultiProbabilityClosure<T> {

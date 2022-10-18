@@ -219,8 +219,6 @@ public class TimeSeries implements EventListener, UpdatableSource {
 	 *            if false.
 	 * @param separator
 	 *            The character used to separate data.
-	 * @throws IOException
-	 *             In case of IO error.
 	 */
 	public void saveToFile(String path, String fileName, boolean withTimes, char separator) {
 

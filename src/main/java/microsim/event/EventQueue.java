@@ -110,10 +110,10 @@ public class EventQueue {
      * Schedule a generic event to occur at a given time.
      *
      * @param atTime       The time when event will be fired.
-     * @param withOrdering The order that the event will be fired: for two events e1 and e2 scheduled to occur at the
-     *                     same time (e1.time == e2.time), if e1.ordering < e2.ordering, then e1 will be fired first.
-     *                     If e1.time == e2.time AND e1.ordering == e2.ordering, the first event that was scheduled
-     *                     (added to the EventQueue) will be fired first.
+     * @param withOrdering The order that the event will be fired: for two events {@code e1} and {@code e2} scheduled to
+     *                     occur at the same time {@code e1.time == e2.time}, if {@code e1.ordering < e2.ordering}, then
+     *                     {@code e1} will be fired first. If {@code e1.time == e2.time AND e1.ordering == e2.ordering},
+     *                     the first event that was scheduled (added to the {@link EventQueue}) will be fired first.
      */
     public EventQueue scheduleOnce(final @NonNull Event event, final double atTime, final int withOrdering) {
         event.setTimeOrderingAndLoopPeriod(atTime, withOrdering, 0);
@@ -126,10 +126,11 @@ public class EventQueue {
      * Schedule a generic looped event at a given time and ordering.
      *
      * @param atTime            The time when event will be fired for the first time.
-     * @param withOrdering      The order that the event will be fired: for two events e1 and e2 scheduled to occur at
-     *                          the same time (e1.time == e2.time), if e1.ordering < e2.ordering, then e1 will be fired
-     *                          first. If e1.time == e2.time AND e1.ordering == e2.ordering, the first event that was
-     *                          scheduled (added to the EventQueue) will be fired first.
+     * @param withOrdering      The order that the event will be fired: for two events {@code e1} and {@code e2}
+     *                          scheduled to occur at the same time {@code e1.time == e2.time}, if
+     *                          {@code e1.ordering < e2.ordering}, then {@code e1} will be fired first. If
+     *                          {@code e1.time == e2.time AND e1.ordering == e2.ordering}, the first event that was
+     *                          scheduled (added to the {@link EventQueue}) will be fired first.
      * @param timeBetweenEvents The time period between repeated firing of the event. If this parameter is set to 0,
      *                          this event will not be fired more than once.
      */
@@ -152,10 +153,10 @@ public class EventQueue {
      * Schedule a looped system event.
      *
      * @param atTime       The time when event will be fired for the first time.
-     * @param withOrdering The order that the event will be fired: for two events e1 and e2 scheduled to occur at the
-     *                     same time (e1.time == e2.time), if e1.ordering < e2.ordering, then e1 will be fired first.
-     *                     If e1.time == e2.time AND e1.ordering == e2.ordering, the first event that was scheduled
-     *                     (added to the EventQueue) will be fired first.
+     * @param withOrdering The order that the event will be fired: for two events {@code e1} and {@code e2} scheduled to
+     *                     occur at the same time {@code e1.time == e2.time}, if {@code e1.ordering < e2.ordering}, then
+     *                     {@code e1} will be fired first. If {@code e1.time == e2.time AND e1.ordering == e2.ordering},
+     *                     the first event that was scheduled (added to the EventQueue) will be fired first.
      * @param withLoop     The time period between repeated firing of the event. If this parameter is set to 0, this
      *                     event will not be fired more than once.
      * @param engine

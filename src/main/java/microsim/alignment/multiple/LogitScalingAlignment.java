@@ -33,7 +33,7 @@ import static java.lang.String.format;
  * for the whole population to align only the relevant subpopulation.
  * <p>
  * In the degenerate case when all probabilities are given as open-point distributions this algorithm fails to
- * converge. This happens due to the fact it conserves 0s & 1s, thus, the entire array of probabilities does
+ * converge. This happens due to the fact it conserves 0s and 1s, thus, the entire array of probabilities does
  * not change.
  * @see <a href="https://ideas.repec.org/a/ijm/journl/v9y2016i3p89-102.html">Peter Stephensen, A General Method
  * for Alignment in Microsimulation models, International Journal of Microsimulation (2016) 9(3) 89-102</a>
