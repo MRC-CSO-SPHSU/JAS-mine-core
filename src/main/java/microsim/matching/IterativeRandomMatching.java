@@ -9,6 +9,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * A singleton class used for matching.
+ *
+ * @param <T> A generic type representing agents.
+ */
 public class IterativeRandomMatching<T> extends AbstractMatcher<T> implements IterativeMatchingAlgorithm<T> {
 
     private static IterativeRandomMatching<?> iterativeRandomMatching;
@@ -16,6 +21,11 @@ public class IterativeRandomMatching<T> extends AbstractMatcher<T> implements It
     private IterativeRandomMatching() {
     }
 
+    /**
+     * A factory method.
+     *
+     * @return the instance of this class.
+     */
     public static @NonNull IterativeRandomMatching<?> getInstance() {
         if (iterativeRandomMatching == null)
             iterativeRandomMatching = new IterativeRandomMatching<>();
@@ -23,8 +33,10 @@ public class IterativeRandomMatching<T> extends AbstractMatcher<T> implements It
         return iterativeRandomMatching;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Pair<Set<T>, Set<T>> matching(final @NonNull Collection<T> collection1, final @Nullable Predicate<T> filter1,
-                                         final @Nullable Comparator<T> comparator,
                                          final @NonNull Collection<T> collection2, final @Nullable Predicate<T> filter2,
                                          final @NonNull MatchingScoreClosure<T> doubleClosure,
                                          final @NonNull MatchingClosure<T> matching) {

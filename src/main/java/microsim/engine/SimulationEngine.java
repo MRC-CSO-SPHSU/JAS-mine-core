@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * The simulation engine. The engine keeps a reference to an {@code EventQueue} object to manage temporal sequence of
+ * The simulation engine. The engine keeps a reference to an {@link EventQueue} object to manage temporal sequence of
  * events. Every object of the running simulation can schedule events at a specified time point and the engine will
  * notify to it at the right time. The SimEngine stores a list of windows created by models.
  */
@@ -29,7 +29,7 @@ import java.util.logging.Level;
 public class SimulationEngine extends Thread {
 
     /**
-     * Returns a reference to the current Random generator.
+     * Returns a reference to the current RNG;
      */
     @Getter
     private static MersenneTwister rnd;
@@ -38,10 +38,10 @@ public class SimulationEngine extends Thread {
     protected ArrayList<EngineListener> engineListeners;
 
     /**
-     * Sets the delay time beetween two simulation steps, ms.
+     * Sets the delay time between two simulation steps, ms.
      */
     @Setter
-    private int eventThresold = 0;
+    private int eventThreshold = 0;
     @Setter
     @Getter
     private int currentRunNumber = 1;
@@ -138,7 +138,7 @@ public class SimulationEngine extends Thread {
         else if (experimentBuilder != null)
             experimentBuilder.buildExperiment(this);
 
-        notifySimulationListeners(SystemEventType.Setup);
+        notifySimulationListeners(SystemEventType.SETUP);
     }
 
     /**
@@ -186,7 +186,7 @@ public class SimulationEngine extends Thread {
         if (!modelBuild) buildModels();
 
         setRunningStatus(true);
-        notifySimulationListeners(SystemEventType.Start);
+        notifySimulationListeners(SystemEventType.START);
     }
 
     /**
@@ -194,7 +194,7 @@ public class SimulationEngine extends Thread {
      */
     public void pause() {
         setRunningStatus(false);
-        notifySimulationListeners(SystemEventType.Stop);
+        notifySimulationListeners(SystemEventType.STOP);
     }
 
     /**
@@ -234,7 +234,7 @@ public class SimulationEngine extends Thread {
 
         turnOffDatabaseConnectionAvailable = (!turnOffDatabaseConnection);
 
-        notifySimulationListeners(SystemEventType.Build);
+        notifySimulationListeners(SystemEventType.BUILD);
 
         try {
             currentExperiment = ExperimentManager.getInstance()
@@ -303,7 +303,7 @@ public class SimulationEngine extends Thread {
 
         setRandomSeed(randomSeed);
 
-        notifySimulationListeners(SystemEventType.Restart);
+        notifySimulationListeners(SystemEventType.RESTART);
         setup();
     }
 
@@ -324,7 +324,7 @@ public class SimulationEngine extends Thread {
     public void end() {
         pause();
         eventQueue.clear();
-        performAction(SystemEventType.End);
+        performAction(SystemEventType.END);
     }
 
     /**
@@ -335,12 +335,12 @@ public class SimulationEngine extends Thread {
      */
     public void performAction(SystemEventType actionType) {
         switch (actionType) {
-            case Stop -> {
+            case STOP -> {
                 pause();
                 for (SimulationManager model : models) model.dispose();
             }
-            case Restart -> rebuildModels();
-            case Shutdown -> quit();
+            case RESTART -> rebuildModels();
+            case SHUTDOWN -> quit();
             default -> {
             }
         }
@@ -371,7 +371,7 @@ public class SimulationEngine extends Thread {
             buildModels();
 
         eventQueue.step();
-        notifySimulationListeners(SystemEventType.Step);
+        notifySimulationListeners(SystemEventType.STEP);
         this.yield();
     }
 
@@ -398,9 +398,9 @@ public class SimulationEngine extends Thread {
                 throw new SimulationRuntimeException(e1);
             }
 
-            if (eventThresold > 0)
+            if (eventThreshold > 0)
                 try {
-                    sleep(eventThresold);
+                    sleep(eventThreshold);
                 } catch (Exception e) {
                     log.log(Level.SEVERE, "Interrupt: " + e.getMessage());
                 }

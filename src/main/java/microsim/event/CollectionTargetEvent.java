@@ -6,47 +6,42 @@ import microsim.exception.SimulationException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * It is able to inform all elements within a collection about an event.
+ * This class informs all elements within a collection about {@link Event}.
  */
+//todo the whole class seems to be package-private
 public class CollectionTargetEvent extends Event {
 
     protected Enum<?> eventType;
-    protected boolean readOnly = true;
+    protected boolean readOnly;
     protected Collection<?> collection;
     private Method methodInvoker;
 
+    private CollectionTargetEvent(final Collection<?> elements, final boolean readOnly) {
+        collection = elements;
+        this.readOnly = readOnly;
+    }
+
     /**
-     * Create a collection event using late binding method call.
+     * Creates an object of {@link CollectionTargetEvent} type using late binding method call (type detection happens at
+     * run-time).
      *
-     * @throws SimulationException
+     * @param elements   A collection of elements of some nature.
+     * @param objectType The type of {@code elements}.
+     * @param method     The method name.
+     * @param readOnly   A boolean flag that makes {@code elements} an immutable object.
+     * @throws SimulationException  when there is no such method to invoke.
+     * @throws NullPointerException when any of the objects passed to the constructor is {@code null}.
      */
     public CollectionTargetEvent(final @NonNull Collection<?> elements, final @NonNull Class<?> objectType,
                                  final @NonNull String method, final boolean readOnly) throws SimulationException {
-        setForObject(elements, objectType, method, readOnly);
-    }
+        this(elements, readOnly);
 
-    /**
-     * Create a collection event using early binding method call.
-     */
-    public CollectionTargetEvent(final @NonNull Collection<?> elements, final @NonNull Enum<?> actionType,
-                                 final boolean readOnly) {
-        setForObject(elements, actionType, readOnly);
-    }
-
-    /**
-     * Recycling method. See SimEvent for more details.
-     *
-     * @throws SimulationException
-     */
-    public void setForObject(final @NonNull Collection<?> elements, final @NonNull Class<?> objectType,
-                             final @NonNull String method, final boolean readOnly) throws SimulationException {
-        collection = elements;
         eventType = null;
-        this.readOnly = readOnly;
 
         Class<?> cl = objectType;
         while (cl != null)
@@ -57,30 +52,37 @@ public class CollectionTargetEvent extends Event {
                 cl = cl.getSuperclass();
             } catch (SecurityException e) {
                 System.out.println("Method: " + method);
-                System.out.println("SimCollectionEvent -> SecurityException: " + e.getMessage());
+                System.out.println(this.getClass().getName() + " -> SecurityException: " + e.getMessage());
                 printStackTrace(e);
             }
 
         if (methodInvoker == null)
-            throw new SimulationException("SimCollectionEvent didn't find method " + method);
-
+            throw new SimulationException(this.getClass().getName() + " didn't find method " + method);
     }
 
     /**
-     * Recycling method. See SimEvent for more details.
+     * Creates an object of {@link CollectionTargetEvent} type with the method
+     * Creates an object of {@link CollectionTargetEvent} type using early binding method call (all types are set during
+     * the process of compilation).
+     *
+     * @param elements   A collection of elements of some nature.
+     * @param actionType An action to invoke.
+     * @param readOnly   A boolean flag that makes {@code elements} an immutable object.
+     * @throws NullPointerException when any of the objects passed to the constructor is {@code null}.
      */
-    public void setForObject(final @NonNull Collection<?> elements, final @NonNull Enum<?> actionType,
-                             final boolean readOnly) {
-        collection = elements;
+    public CollectionTargetEvent(final @NonNull Collection<?> elements, final @NonNull Enum<?> actionType,
+                                 final boolean readOnly) {
+        this(elements, readOnly);
+
         eventType = actionType;
         methodInvoker = null;
-        this.readOnly = readOnly;
     }
 
     /**
-     * Fire the event, calling each element contained into the collection.
+     * Fires a particular event, i.e., calls each element contained into the collection.
      */
     public void fireEvent() {
+        // todo check the logic of the block right below
         Collection<?> localCollection = collection;
         if (!readOnly)
             localCollection = new ArrayList<Object>(collection);
@@ -113,10 +115,5 @@ public class CollectionTargetEvent extends Event {
                 evL.onEvent(eventType);
             }
         }
-    }
-
-    private void printStackTrace(final @NonNull Exception e) {
-        for (int i = 0; i < e.getStackTrace().length; i++)
-            System.out.println(e.getStackTrace()[i].toString());
     }
 }

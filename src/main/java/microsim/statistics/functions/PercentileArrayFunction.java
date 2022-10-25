@@ -18,9 +18,10 @@ public class PercentileArrayFunction extends AbstractArrayFunction implements Do
     protected double p1, p5, p10, p20, p30, p40, p50, p60, p70, p80, p90, p95, p99;
 
     /**
-     * Create a percentile function on an integer array source.
+     * Creates a percentile function on an integer array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public PercentileArrayFunction(final @NonNull IntArraySource source) {
         super(source);
@@ -30,6 +31,7 @@ public class PercentileArrayFunction extends AbstractArrayFunction implements Do
      * Create a percentile function on a long array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public PercentileArrayFunction(final @NonNull LongArraySource source) {
         super(source);
@@ -39,6 +41,7 @@ public class PercentileArrayFunction extends AbstractArrayFunction implements Do
      * Create a percentile function on a double array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public PercentileArrayFunction(final @NonNull DoubleArraySource source) {
         super(source);
@@ -46,6 +49,8 @@ public class PercentileArrayFunction extends AbstractArrayFunction implements Do
 
     /**
      * {@inheritDoc}
+     *
+     * @throws NullPointerException when {@code data} is {@code null}.
      */
     public void apply(final double @NonNull [] data) {
         DescriptiveStatistics stats = new DescriptiveStatistics(data);
@@ -69,17 +74,20 @@ public class PercentileArrayFunction extends AbstractArrayFunction implements Do
     /**
      * {@inheritDoc}
      */
-    public void apply(final int @NonNull [] data) {
-
+    public void apply(final int[] data) {
     }
 
     /**
      * {@inheritDoc}
      */
-    public void apply(final long @NonNull [] data) {
-
+    public void apply(final long[] data) {
     }
 
+    /**
+     * @param variableID A unique identifier for a variable.
+     * @return the actual percentile value.
+     * @throws NullPointerException when {@code variableID} is {@code null}.
+     */
     public double getDoubleValue(final @NonNull Enum<?> variableID) {
         return switch ((Variables) variableID) {
             case P1 -> p1;

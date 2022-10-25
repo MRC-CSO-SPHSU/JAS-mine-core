@@ -26,10 +26,23 @@ import static jamjam.Mean.mean;
  * @see <a href="https://www.jasss.org/17/1/15.html">Li, Jinjing and O'Donoghue, Cathal (2014) 'Evaluating Binary
  * Alignment Methods in Microsimulation Models' Journal of Artificial Societies and Social Simulation 17 (1) 15</a>
  */
-@SuppressWarnings("unused")
+
 @Log
 public class MultiplicativeScalingAlignment<T> implements AlignmentUtils<T> {
 
+
+    /**
+     * The main alignment method. It involves scaling the existing probabilities by multiplying by a factor. Its value
+     * is the target probability divided by the sum of all initial probabilities. The resulting values then are compared
+     * to a random number from the {@code (0, 1)} range to decide if the transition happens.
+     *
+     * @param agents            An unfiltered collection of agents.
+     * @param filter            A logical filter for agents, can be {@code null}.
+     * @param closure           A closure to handle probabilities of agents.
+     * @param targetProbability The target probability value.
+     * @return The corrected set of outcomes.
+     * @throws NullPointerException when {@code agents}, or {@code closure}, or both are {@code null}.
+     */
     public double @NonNull [] align(final @NonNull Collection<T> agents, final @Nullable Predicate<T> filter,
                                     final @NonNull AlignmentProbabilityClosure<T> closure,
                                     final double targetProbability) {

@@ -13,6 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+/**
+ * This class is an implementation of a {@link Map} that has multiple keys and multiple values <em>at the same</em>
+ * time.
+ */
 public class MultiKeyCoefficientMap extends MultiKeyMap {
 
     @Serial
@@ -22,11 +26,12 @@ public class MultiKeyCoefficientMap extends MultiKeyMap {
     protected Map<String, Integer> valuesMap;
 
     /**
-     * Creates an empty new MultiKeyCoefficientMap with the names of the keys and values categories specified by
-     * {@code String[]} keys and {@code String[]} values arguments.
+     * Creates an empty new {@link MultiKeyCoefficientMap} with the names of the keys and values categories specified by
+     * {@link String}{@code []} keys and {@link String}{@code []} values arguments.
      *
-     * @param keys   A {@code String} array listing the names of the categories of keys.
-     * @param values A {@code String} array listing the names of the categories of values.
+     * @param keys   A {@link String} array listing the names of the categories of keys.
+     * @param values A {@link String} array listing the names of the categories of values.
+     * @throws NullPointerException when {@code keys} or any of its elements is {@code 0}.
      */
     public MultiKeyCoefficientMap(final @NonNull String @Nullable [] keys, final @Nullable String @Nullable [] values) {
         super();
@@ -38,12 +43,13 @@ public class MultiKeyCoefficientMap extends MultiKeyMap {
     }
 
     /**
-     * Creates a new MultiKeyCoefficientMap with values stored in map, and with the names of the keys and values
-     * categories specified by {@code String[]} keys and {@code String[]} values arguments.
+     * Creates a new {@link MultiKeyCoefficientMap} with values stored in map, and with the names of the keys and values
+     * categories specified by {@link String}{@code []} keys and {@link String}{@code []} values arguments.
      *
      * @param map    Contains the values of the MultiKeyCoefficientMap.
-     * @param keys   A {@code String} array listing the names of the categories of keys.
-     * @param values A {@code String} array listing the names of the categories of values.
+     * @param keys   A {@link String} array listing the names of the categories of keys.
+     * @param values A {@link String} array listing the names of the categories of values.
+     * @throws NullPointerException when {@code map} is {@code null}.
      */
     public MultiKeyCoefficientMap(final @NonNull AbstractHashedMap map, final @NonNull String @Nullable [] keys,
                                   final @Nullable String @Nullable [] values) {
@@ -55,6 +61,13 @@ public class MultiKeyCoefficientMap extends MultiKeyMap {
         }
     }
 
+    /**
+     * Converts {@code value} to a {@link String}.
+     *
+     * @param value An object that can be {@link String}, {@link Double}, or {@link Boolean}.
+     * @return the string representation of {@code value}.
+     * @throws NullPointerException when {@code value} is {@code null}.
+     */
     public static @NonNull String toStringKey(final @NonNull Object value) {
         if (value instanceof String s) {
             return s;
@@ -66,15 +79,41 @@ public class MultiKeyCoefficientMap extends MultiKeyMap {
         return value.toString();
     }
 
+    /**
+     * Gets an object from a vector using the provided {@code key}.
+     *
+     * @param key    A {@link String} representing a key.
+     * @param vector An array of objects, the array itself or any of its elements can be {@code null}.
+     * @return {@code null} when {@code vector} is {@code null} or when the value that corresponds to {@code key} is
+     * {@code null}; an element of {@code vector} otherwise.
+     * @throws NullPointerException when {@code key} is {@code null}.
+     */
     private @Nullable Object extractValueFromVector(final @NonNull String key,
                                                     final @Nullable Object @Nullable [] vector) {
         return vector == null ? null : valuesMap.get(key) == null ? null : vector[valuesMap.get(key)];
     }
 
-    private void putValueToVector(String key, Object[] vector, Object value) {
+    /**
+     * Assigns a value to a given element of a vector.
+     *
+     * @param key    A {@link String} representing a key.
+     * @param vector A vector of objects to be updated, can be {@code null}.
+     * @param value  An object to be passed to {@code vector}, can be {@code null}.
+     * @throws NullPointerException when {@code key} is {@code null}.
+     */
+    private void putValueToVector(@NonNull String key, @Nullable Object[] vector, @Nullable Object value) {
         if (vector != null && valuesMap.get(key) != null) vector[valuesMap.get(key)] = value;
     }
 
+    /**
+     * Extracts the value that corresponds to {@code key} from the map.
+     *
+     * @param key A key or an array of keys.
+     * @return the value that corresponds to {@code key}.
+     * @throws NullPointerException     when {@code key} is {@code null} or when it's an array containing at least one
+     *                                  {@code null} object.
+     * @throws IllegalArgumentException when the total number of keys in {@code key} exceeds a certain threshold.
+     */
     public @Nullable Object getValue(final @NonNull Object @NonNull ... key) {
         if (key.length == keys.length) {
             return switch (key.length) {
@@ -119,6 +158,13 @@ public class MultiKeyCoefficientMap extends MultiKeyMap {
             throw new IllegalArgumentException("Wrong number of key parameters");
     }
 
+    /**
+     * Adds a value to the map.
+     *
+     * @param keyValues A single key or an array or keys.
+     * @throws NullPointerException     when the input is {@code null} or contains {@code null}.
+     * @throws IllegalArgumentException when the number of keys exceeds the limit.
+     */
     public void putValue(final @NonNull Object @NonNull ... keyValues) {
         if (keyValues.length == keys.length + 1) {
             switch (keyValues.length) {
@@ -192,21 +238,23 @@ public class MultiKeyCoefficientMap extends MultiKeyMap {
     }
 
     /**
-     * This method allows the instance of the MultiKeyCoefficientMap to provide a clone of the names of the keys. This
-     * is especially useful for getting the name of the variables used as keys in the Regression classes.
+     * This method allows an instance of the {@link MultiKeyCoefficientMap} to provide a clone of the names of the keys.
+     * This is especially useful for getting the name of the variables used as keys in the
+     * {@link microsim.statistics.regression} classes.
      *
-     * @return a String array clone of the names of the MultiKeyCoefficientMap's keys
+     * @return a {@link String} array clone of the names of the {@link MultiKeyCoefficientMap}'s keys.
      */
-    public @NonNull String @Nullable [] getKeysNames() {        //The instance of a MultiKeyCoeffientMap can provide the name of the variables used as keys.
+    public @NonNull String @Nullable [] getKeysNames() {
         val keysClone = new String[keys.length];
         System.arraycopy(keys, 0, keysClone, 0, keys.length);
         return keysClone;
     }
 
     /**
-     * This method allows the instance of the MultiKeyCoefficientMap to provide a clone of the names of the values.
+     * This method allows an instance of the {@link MultiKeyCoefficientMap} to provide a clone of the names of the
+     * values.
      *
-     * @return a String array clone of the names of the MultiKeyCoefficientMap's values
+     * @return a {@link String} array clone of the names of the {@link MultiKeyCoefficientMap}'s values
      */
     public @NonNull String @Nullable [] getValuesNames() {
         val valuesClone = new String[valuesMap.size()];
@@ -215,7 +263,7 @@ public class MultiKeyCoefficientMap extends MultiKeyMap {
     }
 
     /**
-     * Returns a deep clone copy of the MultiKeyCoefficientMap object
+     * @return a deep clone copy of the {@link MultiKeyCoefficientMap} object
      */
     @Override
     public MultiKeyCoefficientMap clone() {

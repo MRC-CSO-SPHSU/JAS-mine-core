@@ -4,6 +4,7 @@ import lombok.NonNull;
 import microsim.statistics.*;
 import microsim.statistics.DoubleArraySource;
 import microsim.statistics.DoubleSource;
+import org.jetbrains.annotations.Nullable;
 
 import static jamjam.Sum.sum;
 
@@ -14,18 +15,20 @@ import static jamjam.Sum.sum;
 public abstract class SumArrayFunction extends AbstractArrayFunction implements DoubleSource {
 
     /**
-     * Create a sum function on an integer array source.
+     * Creates a sum function on an integer array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public SumArrayFunction(final @NonNull IntArraySource source) {
         super(source);
     }
 
     /**
-     * Create a sum function on a long array source.
+     * Creates a sum function on a long array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public SumArrayFunction(final @NonNull LongArraySource source) {
         super(source);
@@ -35,6 +38,7 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
      * Create a sum function on a double array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public SumArrayFunction(final @NonNull DoubleArraySource source) {
         super(source);
@@ -47,9 +51,10 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
         protected double dsum;
 
         /**
-         * Create a sum function on a double array source.
+         * Creates a sum function on a double array source.
          *
          * @param source The data source.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Double(final @NonNull DoubleArraySource source) {
             super(source);
@@ -57,6 +62,8 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code data} is {@code null}.
          */
         public void apply(final double @NonNull [] data) {
             dsum = sum(data);
@@ -65,7 +72,7 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
         /**
          * {@inheritDoc}
          */
-        public double getDoubleValue(final @NonNull Enum<?> id) {
+        public double getDoubleValue(final @Nullable Enum<?> id) {
             return dsum;
         }
     }
@@ -80,6 +87,7 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
          * Create a sum function on a long array source.
          *
          * @param source The data source.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Long(final @NonNull LongArraySource source) {
             super(source);
@@ -87,6 +95,8 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code data} is {@code null}.
          */
         public void apply(final long @NonNull [] data) {
             lsum = 0;
@@ -97,14 +107,14 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
         /**
          * {@inheritDoc}
          */
-        public long getLongValue(final @NonNull Enum<?> id) {
+        public long getLongValue(final @Nullable Enum<?> id) {
             return lsum;
         }
 
         /**
          * {@inheritDoc}
          */
-        public double getDoubleValue(final @NonNull Enum<?> variableID) {
+        public double getDoubleValue(final @Nullable Enum<?> variableID) {
             return lsum;
         }
     }
@@ -119,6 +129,7 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
          * Create a sum function on an integer array source.
          *
          * @param source The data source.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Integer(final @NonNull IntArraySource source) {
             super(source);
@@ -126,6 +137,8 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code data} is {@code null}.
          */
         public void apply(final int @NonNull [] data) {
             isum = 0;
@@ -135,14 +148,14 @@ public abstract class SumArrayFunction extends AbstractArrayFunction implements 
         /**
          * {@inheritDoc}
          */
-        public int getIntValue(final @NonNull Enum<?> id) {
+        public int getIntValue(final @Nullable Enum<?> id) {
             return isum;
         }
 
         /**
          * {@inheritDoc}
          */
-        public double getDoubleValue(final @NonNull Enum<?> variableID) {
+        public double getDoubleValue(final @Nullable Enum<?> variableID) {
             return isum;
         }
     }

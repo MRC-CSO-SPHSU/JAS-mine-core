@@ -7,14 +7,15 @@ import lombok.NonNull;
  */
 public interface IntSource {
     /**
-     * Return the integer value corresponding to the given variableID
+     * Returns the integer value corresponding to the given {@code variableID}
      *
      * @param variableID A unique identifier for a variable.
      * @return The current integer value of the required variable.
+     * @throws NullPointerException when {@code variableID} is {@code null}.
      */
     int getIntValue(final @NonNull Enum<?> variableID);
 
     enum Variables {
-        Default
+        DEFAULT
     }
 }

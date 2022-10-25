@@ -15,28 +15,30 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 /**
- * Singleton. Utility used to create ana manage experiment setup. It makes copies of input folder into output and create
- * experiment run record into output database.
+ * A singleton meaning at most one instance of the class exists at the time. This is a utility class used to create ana
+ * manage experiment setup. It makes copies of input folder into output and create experiment run record into output
+ * database.
  */
 @Log
 public class ExperimentManager {
-
     private static ExperimentManager manager;
-
     /**
      * The flag determines if the tool must copy input resources into output folder.
      */
     public boolean copyInputFolderStructure = true;
-
     /**
      * The flag determines if output database must automatically be created.
      */
     public boolean saveExperimentToDatabase = true;
 
+    private ExperimentManager() {
+    }
+
     /**
-     * Checks {@code manager}, if {@code null}, generates a new instance of {@link ExperimentManager}.
+     * Checks {@code manager}, if {@code null}, generates a new instance of {@link ExperimentManager}, else uses the
+     * existing one.
      *
-     * @return an instance of {@link ExperimentManager}.
+     * @return the instance of {@link ExperimentManager}.
      */
     public static @NonNull ExperimentManager getInstance() {
         manager = manager == null ? new ExperimentManager() : manager;
@@ -48,6 +50,7 @@ public class ExperimentManager {
      *
      * @param multiRunId The experiment id.
      * @return an instance of {@link Experiment}.
+     * @throws NullPointerException when {@code multiRunId} is {@code null}.
      */
     public @NonNull Experiment createExperiment(final @NonNull String multiRunId) {
         val experiment = new Experiment();
@@ -63,7 +66,8 @@ public class ExperimentManager {
      *
      * @param fileName  The source file/directory
      * @param outFolder The destination folder.
-     * @throws IOException when something goes wrong (permissions / lack of space).
+     * @throws IOException          when something goes wrong (permissions / lack of space).
+     * @throws NullPointerException when at least one of the input parameters is {@code null}.
      */
     public void copy(final @NonNull String fileName, final @NonNull String outFolder) throws IOException {
         val source = new File(fileName).toPath();
@@ -93,15 +97,29 @@ public class ExperimentManager {
         });
     }
 
-    public @NonNull Experiment setupExperiment(@NonNull Experiment experiment,
-                                               final @NonNull Object... models) throws Exception {
+    /**
+     * Creates the experiment setup by copying input files to the output folder. In addition, creates a database if
+     * needed and establishes a connection to it.
+     *
+     * @param experiment An {@link Experiment} object.
+     * @param models     An array of models.
+     * @return the updated {@code experiment}.
+     * @throws NullPointerException when at least one input parameter is {@code null}.
+     * @throws RuntimeException     when file copying fails.
+     */
+    public @NonNull Experiment setupExperiment(@NonNull Experiment experiment, final @NonNull Object... models) {
         val outFolder = experiment.getOutputFolder() + File.separator + "input";
 
         log.log(Level.INFO, "Setting up experiment " + experiment.runId);
 
         if (copyInputFolderStructure) {
             log.log(Level.INFO, "Copying folder structure");
-            copy(experiment.inputFolder, outFolder);
+            try {
+                copy(experiment.inputFolder, outFolder);
+            } catch (IOException e) {
+                log.log(Level.SEVERE, "Failed to copy input files to the output folder.", e);
+                throw new RuntimeException("Failed to copy input files to the output folder.", e);
+            }
         } else DatabaseUtils.databaseInputUrl = experiment.inputFolder + File.separator + "input";
 
         if (saveExperimentToDatabase) {
@@ -110,7 +128,8 @@ public class ExperimentManager {
             if (!dbFile.exists()) dbFile.mkdir();
 
             if (copyInputFolderStructure) DatabaseUtils.databaseInputUrl = outFolder + File.separator + "input";
-            DatabaseUtils.databaseOutputUrl = experiment.getOutputFolder() + File.separator + "database" + File.separator + "out";
+            DatabaseUtils.databaseOutputUrl = experiment.getOutputFolder() + File.separator + "database" +
+                File.separator + "out";
 
             experiment = DatabaseUtils.createExperiment(Objects.requireNonNull(DatabaseUtils.getOutEntityManger()),
                 experiment, models);

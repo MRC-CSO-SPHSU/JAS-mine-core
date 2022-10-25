@@ -131,7 +131,7 @@ public abstract class MultiRun extends Thread implements EngineListener, Experim
      * @param event A {@link SystemEventType} event.
      */
     public void onEngineEvent(@NonNull SystemEventType event) {
-        if (event.equals(SystemEventType.End)) {
+        if (event.equals(SystemEventType.END)) {
             if (multiRunListeners != null)
                 for (MultiRunListener listener : multiRunListeners)
                     listener.afterSimulationCompleted(engine);

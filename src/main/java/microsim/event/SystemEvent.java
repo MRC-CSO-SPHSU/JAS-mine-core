@@ -6,39 +6,50 @@ import microsim.exception.SimulationException;
 
 /**
  * System events are directly processed by the simulation engine. There are some special events that engine is able to
- * understand. For instance, you can schedule the end of simulation using a system event.
- * <br><i> SystemEvent e = new SystemEvent(Sim.EVENT_SIMULATION_END);
- * >eventQueue.schedule(100, e);</i><br>
- * The above code make the engine stop at 100. When this event happens the simulationEnd() method of the current running
- * models is called.
+ * understand. For instance, you can schedule the end of simulation using a system event {@link SystemEventType#END} by
+ * passing it to {@link EventQueue}.
  */
 public class SystemEvent extends Event {
 
     SystemEventType type;
     SimulationEngine engine;
 
+    /**
+     * The default constructor.
+     *
+     * @param engine A {@link SimulationEngine} object.
+     * @param type   The type of system event.
+     * @throws NullPointerException when any of the input object is {@code null}.
+     */
     public SystemEvent(final @NonNull SimulationEngine engine, final @NonNull SystemEventType type) {
         this.type = type;
         this.engine = engine;
     }
 
+    /**
+     * Triggers the event based on its type
+     *
+     * @throws SimulationException when the engine fails to progress current simulation.
+     */
     public void fireEvent() throws SimulationException {
         switch (type) {
-            case Start -> engine.startSimulation();
-            case Restart -> engine.rebuildModels();
-            case Stop -> engine.pause();
-            case Shutdown -> engine.quit();
-            case Build -> engine.buildModels();
-            case Step -> engine.step();
-            case End -> engine.end();
-            case Setup -> engine.setup();
+            case START -> engine.startSimulation();
+            case RESTART -> engine.rebuildModels();
+            case STOP -> engine.pause();
+            case SHUTDOWN -> engine.quit();
+            case BUILD -> engine.buildModels();
+            case STEP -> engine.step();
+            case END -> engine.end();
+            case SETUP -> engine.setup();
         }
     }
 
     /**
-     * Return a string describing event.
+     * Converts this system event to a string.
+     *
+     * @return the string representation of an event.
      */
     public @NonNull String toString() {
-        return "SystemEvent(@" + getTime() + " " + type;
+        return "SystemEvent(@" + getTime() + " " + type + ")";
     }
 }

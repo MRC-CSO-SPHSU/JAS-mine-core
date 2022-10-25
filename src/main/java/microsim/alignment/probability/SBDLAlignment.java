@@ -11,6 +11,12 @@ import static java.lang.StrictMath.log;
  * Methods in Microsimulation Models, Journal of Artificial Societies and Social Simulation 17 (1) 15</a>
  */
 public class SBDLAlignment<T> extends AbstractSortByDifferenceAlignment<T> {
+
+    /**
+     * {@inheritDoc}
+     *
+     * @implSpec {@code Q_i = ln(1 / R_i - 1) + ln(P_i / (1 - P_i))}.
+     */
     @Override
     double @NonNull [] generateSortingVariable(final double @NonNull [] pArray, final double @NonNull [] rArray) {
         val returnValues = new double[pArray.length];

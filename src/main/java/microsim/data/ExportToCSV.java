@@ -21,18 +21,18 @@ import static java.lang.String.valueOf;
 import static java.util.Objects.isNull;
 
 /**
- * ExportToCSV class allows the exporting of data to .csv files. This is a useful alternative to exporting to an output
- * database, as it is faster and produces separate files for each class of object. Note that only numbers, enums or
- * strings are exported to .csv files.
+ * {@link ExportToCSV} class allows the exporting of data to {@code *.csv} files. This is a useful alternative to
+ * exporting to an output database, as it is faster and produces separate files for each class of object. Note that only
+ * numbers, enums or strings are exported to {@code *.csv} files.
  */
 @Log
 public class ExportToCSV {
-    final static String newLine = "\n";
-    final static String delimiter = ",";
+    final static String NEW_LINE = "\n";
+    final static String DELIMITER = ",";
     final static SimulationEngine simInstance = SimulationEngine.getInstance();
     final static String directory = simInstance.getCurrentExperiment().getOutputFolder() + separator + "csv";
 
-    final static String m = ", no data is written.";
+    final static String FAIL_WRITING = ", no data is written.";
 
     Set<String> fieldsForExport;
     BufferedWriter bufferWriter;
@@ -44,14 +44,15 @@ public class ExportToCSV {
     Field targetObjectIdField;
 
     /**
-     * Allows the exporting of all fields (including private and inherited fields) of an object to a {@code .csv} file
-     * named after the object's class name. Note that only numbers, enums or strings are exported to {@code .csv} files.
-     * The {@code serialVersionUID} of a class will also not be exported.
+     * Allows the exporting of all fields (including private and inherited fields) of an object to a {@code *.csv} file
+     * named after the object's class name. Note that only numbers, enums or strings are exported to {@code *.csv}
+     * files. The {@code serialVersionUID} of a class will also not be exported.
      *
-     * @param target The object whose fields will be exported to a {@code .csv} file with a name equal to the object's
-     *               class name. If the target is a {@code Collection} of objects, each member of the collection will
-     *               have their individual fields exported to the .csv file, labelled by their id.
-     * @implNote
+     * @param target The object whose fields will be exported to a {@code *.csv} file with a name equal to the object's
+     *               class name. If the target is a {@link Collection} of objects, each member of the collection will
+     *               have their individual fields exported to the {@code *.csv} file, labelled by their id.
+     *               Can be {@code null}.
+     * @implSpec No export happens when {@code target} is {@code null}, but the attempt is logged.
      */
     public ExportToCSV(final @Nullable Object target) {
         if (isNull(target)) {
@@ -66,7 +67,7 @@ public class ExportToCSV {
 
         if (collectionMode) {
             if (targetCollection.size() == 0) {
-                log.log(Level.SEVERE, "The collection size is 0" + m);
+                log.log(Level.SEVERE, "The collection size is 0" + FAIL_WRITING);
                 return;
             } else {
                 try {
@@ -77,7 +78,7 @@ public class ExportToCSV {
                     val scratch = new ArrayList<>();
                     for (Object nextObject : targetCollection) if (!isNull(nextObject)) scratch.add(nextObject);
                     if (scratch.size() == 0) {
-                        log.log(Level.SEVERE, "All objects in the collection are null" + m);
+                        log.log(Level.SEVERE, "All objects in the collection are null" + FAIL_WRITING);
                         return;
                     }
                     targetCollection = scratch;
@@ -90,12 +91,12 @@ public class ExportToCSV {
             while (iterator.hasNext()) {
                 val actualObject = iterator.next();
                 if (!refObject.getClass().equals(actualObject.getClass())) {
-                    log.log(Level.SEVERE, "Objects in the collection are of different type" + m);
+                    log.log(Level.SEVERE, "Objects in the collection are of different type" + FAIL_WRITING);
                     return;
                 }
             }
             if (refObject.getClass().getDeclaredFields().length == 0) {
-                log.log(Level.SEVERE, "The collection has no usable fields" + m);
+                log.log(Level.SEVERE, "The collection has no usable fields" + FAIL_WRITING);
                 return;
             }
         }
@@ -118,14 +119,14 @@ public class ExportToCSV {
                 }
             }
         } else {
-            log.log(Level.SEVERE, "The object has no fields" + m);
+            log.log(Level.SEVERE, "The object has no fields" + FAIL_WRITING);
             return;
         }
 
         if (idField != null) idField.setAccessible(true);
         else {
             log.log(Level.SEVERE, "The object of type " + target.getClass() + " does not have a field of type" +
-                " PanelEntityKey.class" + m);
+                " PanelEntityKey.class" + FAIL_WRITING);
             return;
         }
 
@@ -141,12 +142,12 @@ public class ExportToCSV {
         try {
             fileExists = file.exists();
         } catch (SecurityException e) {
-            log.log(Level.SEVERE, "Can't verify file/dir existence due to lack of access" + m);
+            log.log(Level.SEVERE, "Can't verify file/dir existence due to lack of access" + FAIL_WRITING);
             return;
         }
 
         if (file.isDirectory()) {
-            log.log(Level.SEVERE, "The path is a directory, not a file" + m);
+            log.log(Level.SEVERE, "The path is a directory, not a file" + FAIL_WRITING);
             return;
         }
 
@@ -154,7 +155,7 @@ public class ExportToCSV {
             if (!dirExist) {
                 dirExist = dir.mkdirs();
                 if (!dirExist) {
-                    log.log(Level.SEVERE, "Failed to create a new directory" + m);
+                    log.log(Level.SEVERE, "Failed to create a new directory" + FAIL_WRITING);
                     return;
                 }
             }
@@ -163,12 +164,12 @@ public class ExportToCSV {
                 fileExists = file.createNewFile();
                 createdNow = true;
             } catch (IOException e) {
-                log.log(Level.SEVERE, "I/O error occurred" + m);
+                log.log(Level.SEVERE, "I/O error occurred" + FAIL_WRITING);
                 return;
             }
 
             if (!fileExists) {
-                log.log(Level.SEVERE, "Failed to create a new file" + m);
+                log.log(Level.SEVERE, "Failed to create a new file" + FAIL_WRITING);
                 return;
             }
         }
@@ -176,15 +177,15 @@ public class ExportToCSV {
         try {
             bufferWriter = new BufferedWriter(new FileWriter(file, true));
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Failed to create a buffer writer" + m);
+            log.log(Level.SEVERE, "Failed to create a buffer writer" + FAIL_WRITING);
             return;
         }
 
         if (createdNow) {
             try {
-                bufferWriter.append("run" + delimiter + "time" + delimiter + "id_").append(filename).append(delimiter);
+                bufferWriter.append("run" + DELIMITER + "time" + DELIMITER + "id_").append(filename).append(DELIMITER);
             } catch (IOException e) {
-                log.log(Level.SEVERE, "Failed to append to the buffer writer" + m);
+                log.log(Level.SEVERE, "Failed to append to the buffer writer" + FAIL_WRITING);
                 return;
             }
         }
@@ -215,8 +216,10 @@ public class ExportToCSV {
      * matches the required field name.
      *
      * @param type      Class type to be searched through.
-     * @param fieldName The name of the {@code Field}.
-     * @return null, if there is no fields at all or no matches; the actual {@code Field} object if there is a match.
+     * @param fieldName The name of the {@link Field}, can be {@code null}.
+     * @return {@code null}, if there is no fields at all or no matches; the actual {@link Field} object if there is a
+     * match.
+     * @throws NullPointerException when {@code type} is {@code null}.
      */
     static @Nullable Field findUnderlyingField(final @NonNull Class<?> type, final @Nullable String fieldName) {
         if (fieldName == null) return null;
@@ -235,8 +238,8 @@ public class ExportToCSV {
     /**
      * Recursive method to get all fields of a class, including inherited ones. No field type filtering is done here.
      *
-     * @param type The class to be analyzed.
-     * @return A list of fields.
+     * @param type The class to be analyzed, can be {@code null}.
+     * @return A list of fields, always not {@code null}.
      */
     static @NonNull List<Field> getAllFields(final @Nullable Class<?> type) {
         if (type == null) return new ArrayList<>();
@@ -254,15 +257,16 @@ public class ExportToCSV {
      * @param createdNowFlag Shows if there is a need to create headers, but only if there was no file there.
      * @param fieldNameSet   A set of strings that correspond to field names.
      * @return {@code null} if can't add to the buffer, a {@link LinkedHashSet} otherwise.
+     * @throws NullPointerException when {@code fieldNameSet} is {@code null}.
      */
     public @Nullable LinkedHashSet<String> extractFieldNames(final boolean createdNowFlag,
                                                              final @NonNull TreeSet<String> fieldNameSet) {
         if (createdNowFlag) {
             for (var fieldNames : fieldNameSet)
                 try {
-                    bufferWriter.append(fieldNames).append(delimiter);
+                    bufferWriter.append(fieldNames).append(DELIMITER);
                 } catch (IOException e) {
-                    log.log(Level.SEVERE, "Failed to append headers to the buffer writer" + m);
+                    log.log(Level.SEVERE, "Failed to append headers to the buffer writer" + FAIL_WRITING);
                     return null;
                 }
         }
@@ -270,12 +274,13 @@ public class ExportToCSV {
     }
 
     /**
-     * Generates filenames based on the parsed object name, its type (collection or not), and {@code Field} id.
+     * Generates filenames based on the parsed object name, its type (collection or not), and {@link Field} id.
      *
      * @param parsedTargetObject The object containing data saved to the file.
-     * @param collectionModeFlag True when the parsed object is {@code Collection}.
-     * @param id                 Object {@code Field} id.
-     * @return A {@code String} or {@code null} when some checks fail.
+     * @param collectionModeFlag True when the parsed object is {@link Collection}.
+     * @param id                 Object {@link Field} id.
+     * @return A {@link String} or {@code null} when some checks fail.
+     * @throws NullPointerException when {@code parsedTargetObject}, or {@code id}, or both are {@code null}.
      */
     @Nullable String generateFilename(final @NonNull Object parsedTargetObject, final boolean collectionModeFlag,
                                       final @NonNull Field id) {
@@ -287,22 +292,23 @@ public class ExportToCSV {
             filename.append(appValue);
             return filename.toString();
         } catch (IllegalAccessException e) {
-            log.log(Level.SEVERE, "Failed to append to the filename due to no access" + m);
+            log.log(Level.SEVERE, "Failed to append to the filename due to no access" + FAIL_WRITING);
             return null;
         } catch (ClassCastException e) {
-            log.log(Level.SEVERE, "Target object doesn't have fields of the PanelEntityKey type" + m);
+            log.log(Level.SEVERE, "Target object doesn't have fields of the PanelEntityKey type" + FAIL_WRITING);
             return null;
         } catch (NullPointerException e) {
-            log.log(Level.SEVERE, "The field of the PanelEntityKey type is not initialized, i.e., null" + m);
+            log.log(Level.SEVERE, "The field of the PanelEntityKey type is not initialized, i.e., null" +
+                FAIL_WRITING);
             return null;
         }
     }
 
     /**
-     * Export data to the .csv files named after the class of the target object (or if a collection of objects, the
-     * class of the collection's members).
+     * Export data to the {@code *.csv} files named after the class of the target object (or if a collection of objects,
+     * the class of the collection's members).
      *
-     * @implSpec Only numbers, enums or strings are exported to .csv files.
+     * @implSpec Only numbers, enums or strings are exported to {@code *.csv} files.
      */
     public void dumpToCSV() {
         val run = valueOf(simInstance.getCurrentRunNumber());
@@ -316,14 +322,14 @@ public class ExportToCSV {
                 try {
                     idField = obj.getClass().getDeclaredField(idFieldName);
                 } catch (NoSuchFieldException e) {
-                    log.log(Level.SEVERE, "No such field to get access to" + m);
+                    log.log(Level.SEVERE, "No such field to get access to" + FAIL_WRITING);
                     return;
                 }
                 idField.setAccessible(true);
                 try {
-                    bufferWriter.append(String.valueOf(((PanelEntityKey) idField.get(obj)).getId())).append(delimiter);
+                    bufferWriter.append(String.valueOf(((PanelEntityKey) idField.get(obj)).getId())).append(DELIMITER);
                 } catch (IOException | IllegalAccessException e) {
-                    log.log(Level.SEVERE, "Failed to append panel data to the buffer writer" + m);
+                    log.log(Level.SEVERE, "Failed to append panel data to the buffer writer" + FAIL_WRITING);
                     return;
                 }
 
@@ -334,13 +340,13 @@ public class ExportToCSV {
                     try {
                         value = thisField.get(obj);
                     } catch (IllegalAccessException e) {
-                        log.log(Level.SEVERE, "Failed to get the value of the field" + m);
+                        log.log(Level.SEVERE, "Failed to get the value of the field" + FAIL_WRITING);
                         return;
                     }
                     try {
-                        bufferWriter.append(value == null ? "null" : value.toString()).append(delimiter);
+                        bufferWriter.append(value == null ? "null" : value.toString()).append(DELIMITER);
                     } catch (IOException e) {
-                        log.log(Level.SEVERE, "Failed to append the value to the buffer writer" + m);
+                        log.log(Level.SEVERE, "Failed to append the value to the buffer writer" + FAIL_WRITING);
                         return;
                     }
                 }
@@ -350,9 +356,9 @@ public class ExportToCSV {
 
             try {
                 bufferWriter.append(String.valueOf(((PanelEntityKey) targetObjectIdField.get(targetObject)).getId()))
-                    .append(delimiter);
+                    .append(DELIMITER);
             } catch (IOException | IllegalAccessException | NullPointerException e) {
-                log.log(Level.SEVERE, "Failed to append run id/time/panel data to the buffer writer" + m);
+                log.log(Level.SEVERE, "Failed to append run id/time/panel data to the buffer writer" + FAIL_WRITING);
                 return;
             }
 
@@ -361,7 +367,7 @@ public class ExportToCSV {
                 try {
                     thisField = targetObject.getClass().getDeclaredField(fieldName);
                 } catch (NoSuchFieldException e) {
-                    log.log(Level.SEVERE, "Failed to get the field" + m);
+                    log.log(Level.SEVERE, "Failed to get the field" + FAIL_WRITING);
                     return;
                 }
                 thisField.setAccessible(true);
@@ -369,13 +375,13 @@ public class ExportToCSV {
                 try {
                     value = thisField.get(targetObject).toString();
                 } catch (IllegalAccessException e) {
-                    log.log(Level.SEVERE, "Failed to get the value of a field, no access" + m);
+                    log.log(Level.SEVERE, "Failed to get the value of a field, no access" + FAIL_WRITING);
                     return;
                 }
                 try {
-                    bufferWriter.append(value == null ? "null" : value.toString()).append(delimiter);
+                    bufferWriter.append(value == null ? "null" : value.toString()).append(DELIMITER);
                 } catch (IOException e) {
-                    log.log(Level.SEVERE, "Failed to append a field value to the buffer" + m);
+                    log.log(Level.SEVERE, "Failed to append a field value to the buffer" + FAIL_WRITING);
                     return;
                 }
             }
@@ -396,13 +402,14 @@ public class ExportToCSV {
      *
      * @param runValue  The string representation of a run id.
      * @param timeValue The string representation of a simulation time.
-     * @return {@code boolean}, false if there is no problems. true when fails to append to the buffer.
+     * @return {@code boolean}, {@code false} if there is no problems, {@code true} when fails to append to the buffer.
+     * @throws NullPointerException when {@code runValue}, or {@code timeValue}, ot both are {@code null}.
      */
     boolean addSimParametersToBuffer(final @NonNull String runValue, final @NonNull String timeValue) {
         try {
-            bufferWriter.append(newLine).append(runValue).append(delimiter).append(timeValue).append(delimiter);
+            bufferWriter.append(NEW_LINE).append(runValue).append(DELIMITER).append(timeValue).append(DELIMITER);
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Failed to append run id/time to the buffer writer" + m);
+            log.log(Level.SEVERE, "Failed to append run id/time to the buffer writer" + FAIL_WRITING);
             return true;
         }
         return false;

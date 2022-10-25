@@ -2,6 +2,11 @@ package microsim.alignment.probability;
 
 import lombok.NonNull;
 
+/**
+ * An auxiliary interface to get and align probabilities of an agent.
+ *
+ * @param <T> A generic type representing agents.
+ */
 public interface AlignmentProbabilityClosure<T> {
 
     /**
@@ -10,6 +15,7 @@ public interface AlignmentProbabilityClosure<T> {
      *
      * @param agent an agent-representing object.
      * @return the probability of a 'positive' outcome for the agent.
+     * @throws NullPointerException when {@code agent} is {@code null}.
      */
     double getProbability(final @NonNull T agent);
 
@@ -18,6 +24,7 @@ public interface AlignmentProbabilityClosure<T> {
      *
      * @param agent              an agent-representing object.
      * @param alignedProbability the corrected probability of a 'positive' outcome
+     * @throws NullPointerException when {@code agent} is {@code null}.
      */
     void align(final @NonNull T agent, final double alignedProbability);
 }

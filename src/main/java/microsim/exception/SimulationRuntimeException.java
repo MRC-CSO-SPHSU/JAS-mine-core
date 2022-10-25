@@ -4,6 +4,7 @@ import lombok.NonNull;
 
 import java.io.Serial;
 
+@Deprecated
 public class SimulationRuntimeException extends RuntimeException {
 
     @Serial

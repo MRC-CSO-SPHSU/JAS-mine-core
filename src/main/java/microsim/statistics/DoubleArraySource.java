@@ -7,7 +7,7 @@ import lombok.NonNull;
  */
 public interface DoubleArraySource {
     /**
-     * Return the currently cached array of double values.
+     * Returns the currently cached array of double values.
      *
      * @return An array of double or a null pointer if the source is empty.
      */

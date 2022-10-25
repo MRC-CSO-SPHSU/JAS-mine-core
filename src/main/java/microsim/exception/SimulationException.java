@@ -4,6 +4,7 @@ import lombok.NonNull;
 
 import java.io.Serial;
 
+@Deprecated
 public class SimulationException extends Exception {
 
     @Serial
@@ -24,6 +25,5 @@ public class SimulationException extends Exception {
     public SimulationException(final @NonNull Throwable cause) {
         super(cause);
     }
-
 
 }

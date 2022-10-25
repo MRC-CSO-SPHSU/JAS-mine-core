@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.extern.java.Log;
 import microsim.reflection.ReflectionUtils;
 import microsim.statistics.StringSource;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -26,6 +27,7 @@ public class StringInvoker implements StringSource {
      * @param target    It is the target object.
      * @param fieldName A string representing the name of the method to invoke.
      * @param isMethod  If true the fieldName is a method, otherwise it is a property of the object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
      */
     public StringInvoker(final @NonNull Object target, final @NonNull String fieldName, final boolean isMethod) {
         this.target = target;
@@ -39,6 +41,7 @@ public class StringInvoker implements StringSource {
      * @param target    It is the class of the target object.
      * @param fieldName A string representing the name of the method to invoke.
      * @param isMethod  If true the fieldName is a method, otherwise it is a property of the object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
      */
     public StringInvoker(final @NonNull Class<?> target, final @NonNull String fieldName, final boolean isMethod) {
         this.target = null;
@@ -46,7 +49,7 @@ public class StringInvoker implements StringSource {
         else buildField(target, fieldName);
     }
 
-    private void buildField(final @NonNull Class<?> trgClass, final @NonNull String fieldName) {
+    private void buildField(final Class<?> trgClass, final String fieldName) {
         method = null;
         field = ReflectionUtils.searchField(trgClass, fieldName);
 
@@ -59,7 +62,7 @@ public class StringInvoker implements StringSource {
                 + target + " must return a String value!");
     }
 
-    private void buildMethod(final @NonNull Class<?> trgClass,final @NonNull String methodName) {
+    private void buildMethod(final Class<?> trgClass, final String methodName) {
         field = null;
         method = ReflectionUtils.searchMethod(trgClass, methodName);
 
@@ -73,10 +76,11 @@ public class StringInvoker implements StringSource {
     }
 
     /**
-     * Invoke the method of the target object and return its string result.
+     * Invokes the method of the target object and returns its string result.
      *
      * @param target Object to be invoked.
      * @return The requested string value.
+     * @throws NullPointerException when {@code target} is {@code null}.
      */
     public String getString(final @NonNull Object target) {
         try {
@@ -100,8 +104,7 @@ public class StringInvoker implements StringSource {
     }
 
     /**
-     * Invoke the method of the object passed to constructor and return its
-     * double result.
+     * Invokes the method of the object passed to constructor and returns its double result.
      *
      * @return The requested double value.
      */
@@ -115,10 +118,16 @@ public class StringInvoker implements StringSource {
      * @param valueID This parameter is ignored. It is put for compatibility with the {@link StringSource} interface.
      * @return The requested double value.
      */
-    public @NonNull String getStringValue(final @NonNull Enum<?> valueID) {
+    public @NonNull String getStringValue(final @Nullable Enum<?> valueID) {
         return getString(target);
     }
 
+    /**
+     * Converts a collection of strings to an array.
+     *
+     * @param c A {@link Collection} object.
+     * @return an array.
+     */
     public @NonNull String[] getCollectionValue(final @NonNull Collection<?> c) {
         return (String[]) c.stream().map(this::getString).toArray();
     }

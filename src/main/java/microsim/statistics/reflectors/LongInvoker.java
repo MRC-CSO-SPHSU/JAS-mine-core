@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.extern.java.Log;
 import microsim.reflection.ReflectionUtils;
 import microsim.statistics.LongSource;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +26,7 @@ public class LongInvoker implements LongSource {
      * @param target    It is the target object.
      * @param fieldName A string representing the name of the method to invoke.
      * @param isMethod  If true the fieldName is a method, otherwise it is a property of the object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
      */
     public LongInvoker(final @NonNull Object target, final @NonNull String fieldName, final boolean isMethod) {
         this.target = target;
@@ -38,6 +40,7 @@ public class LongInvoker implements LongSource {
      * @param target    It is the class of the target object.
      * @param fieldName A string representing the name of the method to invoke.
      * @param isMethod  If true the fieldName is a method, otherwise it is a property of the object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
      */
     public LongInvoker(final @NonNull Class<?> target, final @NonNull String fieldName, final boolean isMethod) {
         this.target = null;
@@ -45,7 +48,7 @@ public class LongInvoker implements LongSource {
         else buildField(target, fieldName);
     }
 
-    private void buildField(final @NonNull Class<?> trgClass, final @NonNull String fieldName) {
+    private void buildField(final Class<?> trgClass, final String fieldName) {
         method = null;
         field = ReflectionUtils.searchField(trgClass, fieldName);
 
@@ -58,7 +61,7 @@ public class LongInvoker implements LongSource {
                 + " of object " + target + " must return a long value!");
     }
 
-    private void buildMethod(final @NonNull Class<?> trgClass, final @NonNull String methodName) {
+    private void buildMethod(final Class<?> trgClass, final String methodName) {
         field = null;
         method = ReflectionUtils.searchMethod(trgClass, methodName);
 
@@ -72,10 +75,11 @@ public class LongInvoker implements LongSource {
     }
 
     /**
-     * Invoke the method of the target object and return its double result.
+     * Invokes the method of the target object and return its double result.
      *
      * @param target Object to be invoked.
      * @return The requested double value.
+     * @throws NullPointerException when {@code target} is {@code null}.
      */
     public long getLong(final @NonNull Object target) {
         try {
@@ -106,8 +110,7 @@ public class LongInvoker implements LongSource {
     }
 
     /**
-     * Invoke the method of the object passed to constructor and return its
-     * double result.
+     * Invokes the method of the object passed to constructor and returns its double result.
      *
      * @return The requested double value.
      */
@@ -121,7 +124,7 @@ public class LongInvoker implements LongSource {
      * @param valueID This parameter is ignored. It is put for compatibility with the {@link LongSource} interface.
      * @return The requested double value.
      */
-    public long getLongValue(final @NonNull Enum<?> valueID) {
+    public long getLongValue(final @Nullable Enum<?> valueID) {
         return getLong(target);
     }
 }

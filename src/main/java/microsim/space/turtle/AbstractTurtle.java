@@ -56,7 +56,7 @@ public abstract class AbstractTurtle extends SpacePosition {
     public AbstractTurtle(final @Nullable ObjectSpace grid, final int x, final int y) {
         super(x, y);
         this.grid = grid;
-        this.moving = MoveMode.Torus;
+        this.moving = MoveMode.TORUS;
         if (grid != null) grid.addGridPosition(getPosition());
     }
 
@@ -287,14 +287,14 @@ public abstract class AbstractTurtle extends SpacePosition {
     }
 
     public enum Direction {
-        North(0),
-        NorthEast(1),
-        East(2),
-        SouthEast(3),
-        South(4),
-        SouthWest(5),
-        West(6),
-        NorthWest(7);
+        NORTH(0),
+        NORTH_EAST(1),
+        EAST(2),
+        SOUTH_EAST(3),
+        SOUTH(4),
+        SOUTH_WEST(5),
+        WEST(6),
+        NORTH_WEST(7);
 
         @Getter
         private int numVal;
@@ -328,14 +328,14 @@ public abstract class AbstractTurtle extends SpacePosition {
         /**
          * Turtle moves on a toroidal grid.
          */
-        Torus,
+        TORUS,
         /**
          * Turtle moves on a bounded grid.
          */
-        Bounded,
+        BOUNDED,
         /**
          * Turtle moves on a walled grid.
          */
-        Bounce
+        BOUNCE
     }
 }

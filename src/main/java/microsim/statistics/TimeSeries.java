@@ -6,6 +6,7 @@ import cern.mateba.list.tlong.LongArrayList;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import microsim.engine.SimulationEngine;
 import microsim.event.CommonEventType;
 import microsim.event.EventListener;
@@ -20,277 +21,246 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * It is a collection of series (data panel). It contains more series synching
- * their time.
+ * A container for multiple synchronized time series.
  */
+@Log
 public class TimeSeries implements EventListener, UpdatableSource {
-	private static final Logger log = Logger.getLogger(TimeSeries.class.toString());
 
-	/** A custom event identifier for perfomAction method. Save to disk. */
-	public static final int EVENT_SAVE = 1;
-	/** The character used to separate data in the output file. */
-	public static final char DEFAULT_SEPARATOR = ',';
+    /**
+     * The character used to separate data in the output file: {@value}
+     */
+    public static final char DEFAULT_SEPARATOR = ',';
+    @Getter
+    protected ArrayList<Series> series;
+    protected DoubleArrayList absTimes;
+    protected ArrayList<String> descTimes;
+    @Setter
+    @Getter
+    private String fileName = "timeSeries.txt";
+    private double lastTimeUpdate = -1.;
 
-	@Setter @Getter private String fileName = "timeSeries.txt";
+    /**
+     * Creates a new time series container.
+     */
+    public TimeSeries() {
+        series = new ArrayList<>();
+        absTimes = new DoubleArrayList();
+        descTimes = new ArrayList<>();
+    }
 
-	private double lastTimeUpdate = -1.;
+    /**
+     * Adds a new series to the existing one.
+     *
+     * @param aSeries An instance of {@link Series}.
+     * @throws NullPointerException when {@code aSeries} is {@code null}.
+     */
+    public void addSeries(final @NonNull Series aSeries) {
+        series.add(aSeries);
+    }
 
-	protected ArrayList<Series> series;
-	protected DoubleArrayList absTimes;
-	protected ArrayList<String> descTimes;
+    /**
+     * Adds a new series to the existing one.
+     *
+     * @param source  A {@link DoubleSource} object.
+     * @param valueID The value identifier defined by source object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
+     */
+    public void addSeries(final @NonNull DoubleSource source, final @NonNull Enum<?> valueID) {
+        series.add(new Series.Double(source, valueID));
+    }
 
-	/** Create a new time series container. */
-	public TimeSeries() {
-		series = new ArrayList<>();
-		absTimes = new DoubleArrayList();
-		descTimes = new ArrayList<>();
-	}
+    /**
+     * Adds a new series to the existing one.
+     *
+     * @param source  The {@link IntSource} object.
+     * @param valueID The value identifier defined by source object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
+     */
+    public void addSeries(final @NonNull IntSource source, final @NonNull Enum<?> valueID) {
+        series.add(new Series.Integer(source, valueID));
+    }
 
-	/**
-	 * Add a new series.
-	 *
-	 * @param aSeries
-	 *            An instance of the SeriesStats class.
-	 * @throws IllegalArgumentException
-	 *             If the series name already exists.
-	 */
-	public void addSeries(Series aSeries) {
-		series.add(aSeries);
-	}
+    /**
+     * Adds a new series to the existing one.
+     *
+     * @param source  The LongSource object.
+     * @param valueID The value identifier defined by source object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
+     */
+    public void addSeries(final @NonNull LongSource source, final @NonNull Enum<?> valueID) {
+        series.add(new Series.Long(source, valueID));
+    }
 
-	/**
-	 * Add a new series.
-	 * @param source
-	 *            The {@link DoubleSource} object.
-	 * @param valueID
-	 *            The value identifier defined by source object.
-	 */
-	public void addSeries(DoubleSource source, Enum<?> valueID) {
-		series.add(new Series.Double(source, valueID));
-	}
+    /**
+     * Adds a new series to the existing one.
+     *
+     * @param target        A generic source object.
+     * @param variableName  The name of the field or the method returning the variable to
+     *                      be probed.
+     * @param getFromMethod Specifies if valueName is a method or a property value.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
+     */
+    public void addSeries(final @NonNull Object target, final @NonNull String variableName,
+                          final boolean getFromMethod) {
+        Series aSeries;// bloated
+        if (ReflectionUtils.isDoubleSource(target.getClass(), variableName,
+            getFromMethod))
+            aSeries = new Series.Double(target, variableName, getFromMethod);
+        else if (ReflectionUtils.isIntSource(target.getClass(), variableName,
+            getFromMethod))
+            aSeries = new Series.Integer(target, variableName, getFromMethod);
+        else if (ReflectionUtils.isLongSource(target.getClass(), variableName,
+            getFromMethod))
+            aSeries = new Series.Long(target, variableName, getFromMethod);
+        else
+            throw new IllegalArgumentException("The passed argument is not a valid number source");
 
-	/**
-	 * Add a new series.
-	 * @param source
-	 *            The IntSource object.
-	 * @param valueID
-	 *            The value identifier defined by source object.
-	 */
-	public void addSeries(IntSource source, Enum<?> valueID) {
-		series.add(new Series.Integer(source, valueID));
-	}
+        series.add(aSeries);
+    }
 
-	/**
-	 * Add a new series.
-	 * @param source
-	 *            The LongSource object.
-	 * @param valueID
-	 *            The value identifier defined by source object.
-	 */
-	public void addSeries(LongSource source, Enum<?> valueID) {
-		series.add(new Series.Long(source, valueID));
-	}
+    /**
+     * Updates all the contained time series and the current time.
+     */
+    public void updateSource() {
+        if (SimulationEngine.getInstance().getEventQueue().getTime() == lastTimeUpdate)
+            return;
 
-	/**
-	 * Add a new series.
-	 *
-	 * @param target
-	 *            A generic source object.
-	 * @param variableName
-	 *            The name of the field or the method returning the variable to
-	 *            be probed.
-	 * @param getFromMethod
-	 *            Specifies if valueName is a method or a property value.
-	 */
-	public void addSeries(Object target, String variableName, boolean getFromMethod) {
-		Series aSeries;// bloated
-		if (ReflectionUtils.isDoubleSource(target.getClass(), variableName,
-				getFromMethod))
-			aSeries = new Series.Double(target, variableName, getFromMethod);
-		else if (ReflectionUtils.isIntSource(target.getClass(), variableName,
-				getFromMethod))
-			aSeries = new Series.Integer(target, variableName, getFromMethod);
-		else if (ReflectionUtils.isLongSource(target.getClass(), variableName,
-				getFromMethod))
-			aSeries = new Series.Long(target, variableName, getFromMethod);
-		else
-			throw new IllegalArgumentException("The passed argument is not a valid number source");
+        for (Series value : series) value.updateSource();
 
-		series.add(aSeries);
-	}
+        absTimes.add(SimulationEngine.getInstance().getEventQueue().getTime());
+        descTimes.add("" + SimulationEngine.getInstance().getEventQueue().getTime());
 
-	/** Update all the contained time series and the current time. */
-	public void updateSource() {
-		if (SimulationEngine.getInstance().getEventQueue().getTime() == lastTimeUpdate)
-			return;
+        lastTimeUpdate = SimulationEngine.getInstance().getEventQueue().getTime();
+    }
 
-		for (Series value : series) value.updateSource();
+    /**
+     * Returns a series at the given index.
+     *
+     * @param seriesIndex The name of the series.
+     * @return The asked series or {@code null} if series does not exist.
+     * @throws IndexOutOfBoundsException If {@code seriesIndex} is out of bounds.
+     */
+    public Series getSeries(final int seriesIndex) {
+        if (seriesIndex >= series.size())
+            throw new IndexOutOfBoundsException(seriesIndex + " is out of max bound " + series.size());
 
-		absTimes.add(SimulationEngine.getInstance().getEventQueue().getTime());
-		descTimes.add("" + SimulationEngine.getInstance().getEventQueue().getTime());
+        return series.get(seriesIndex);
+    }
 
-		lastTimeUpdate = SimulationEngine.getInstance().getEventQueue().getTime();
-	}
+    /**
+     * Returns the number of series.
+     *
+     * @return The number of series.
+     */
+    public int getSeriesCount() {
+        return series.size();
+    }
 
-	/**
-	 * Return the list of contained time series.
-	 *
-	 * @return An array list containing SeriesStats objects.
-	 */
-	public ArrayList<Series> getSeriesList() {
-		return series;
-	}
+    /**
+     * Stores the entire data content in the output file in the same directory.
+     */
+    public void saveToFile() {
+        saveToFile("", fileName, true, DEFAULT_SEPARATOR);
+    }
 
-	/**
-	 * Return a series at the given index.
-	 *
-	 * @param seriesIndex
-	 *            The name of the series.
-	 * @return The asked series. Null if series does not exists.
-	 * @throws IndexOutOfBoundsException
-	 *             If seriesIndex is out of bounds.
-	 */
-	public Series getSeries(int seriesIndex) {
-		if (seriesIndex >= series.size())
-			throw new IndexOutOfBoundsException(seriesIndex + " is out of max bound " + series.size());
+    /**
+     * Stores the entire data content in the given output file.
+     *
+     * @param path     The optional path string.
+     * @param fileName The name of the output file.
+     */
+    public void saveToFile(final @NonNull String path, final @NonNull String fileName) {
+        saveToFile(path, fileName, true, DEFAULT_SEPARATOR);
+    }
 
-		return series.get(seriesIndex);
-	}
+    /**
+     * Stores the entire data content in the given output file.
+     *
+     * @param path      The optional path string. Passing an empty string it is ignored.
+     * @param fileName  The name of the output file.
+     * @param withTimes If {@code true} time description is saved. Only absolute time is saved if {@code false}.
+     */
+    public void saveToFile(final @NonNull String path, final @NonNull String fileName, final boolean withTimes) {
+        saveToFile(path, fileName, withTimes, DEFAULT_SEPARATOR);
+    }
 
-	/**
-	 * Return the number of series.
-	 *
-	 * @return The number of series.
-	 */
-	public int getSeriesCount() {
-		return series.size();
-	}
+    /**
+     * Stores the entire data content in the given output file.
+     *
+     * @param path      The optional path string. Passing an empty string it is ignored.
+     * @param fileName  The name of the output file.
+     * @param withTimes If {@code true} time description is saved. Only absolute time is saved if {@code false}.
+     * @param separator The character used to separate data.
+     */
+    public void saveToFile(@NonNull String path, @NonNull String fileName, final boolean withTimes,
+                           final char separator) {
 
-	/**
-	 * Store the entire data content on the output file. It is used the default
-	 * separator and the time description is stored with the absolute one.
-	 */
-	public void saveToFile() {
-		saveToFile("", fileName, true, DEFAULT_SEPARATOR);
-	}
+        if (SimulationEngine.getInstance().getCurrentRunNumber() != 0)
+            fileName = getNumberedFile(fileName);
 
-	/**
-	 * Store the entire data content on the given output file. It is used the
-	 * default separator and the time description is stored with the absolute
-	 * one.
-	 *
-	 * @param path
-	 *            The optional path string. Passing an empty string it is
-	 *            ignored.
-	 * @param fileName
-	 *            The name of the output file.
-	 */
-	public void saveToFile(String path, String fileName) {
-		saveToFile(path, fileName, true, DEFAULT_SEPARATOR);
-	}
+        path += File.separator + fileName;
 
-	/**
-	 * Store the entire data content on the given output file. It is used the
-	 * default separator.
-	 *
-	 * @param path
-	 *            The optional path string. Passing an empty string it is
-	 *            ignored.
-	 * @param fileName
-	 *            The name of the output file.
-	 * @param withTimes
-	 *            If true time description is saved. Only absolute time is saved
-	 *            if false.
-	 */
-	public void saveToFile(String path, String fileName, boolean withTimes) {
-		saveToFile(path, fileName, withTimes, DEFAULT_SEPARATOR);
-	}
+        File file = new File(path);
 
-	/**
-	 * Store the entire data content on the given output file.
-	 *
-	 * @param path
-	 *            The optional path string. Passing an empty string it is
-	 *            ignored.
-	 * @param fileName
-	 *            The name of the output file.
-	 * @param withTimes
-	 *            If true time description is saved. Only absolute time is saved
-	 *            if false.
-	 * @param separator
-	 *            The character used to separate data.
-	 */
-	public void saveToFile(String path, String fileName, boolean withTimes, char separator) {
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(file));
+            if (withTimes) // no need to check every iteration
+                out.write("real time" + separator);
+            out.write("time" + separator);
 
-		if (SimulationEngine.getInstance().getCurrentRunNumber() != 0)
-			fileName = getNumberedFile(fileName);
+            for (var i = 0; i < absTimes.size() - 1; i++) {
+                if (withTimes)
+                    out.write(descTimes.get(i) + separator);
+                out.write("" + absTimes.get(i) + separator);
 
-		path += File.separator + fileName;
+                for (Series s : series) {
+                    if (s instanceof Series.Double) {// bloated
+                        DoubleArrayList dl;
+                        dl = ((Series.Double) s).getDoubleArrayList();
+                        out.write("" + dl.get(i) + separator);
+                    } else if (s instanceof Series.Integer) {
+                        IntArrayList dl;
+                        dl = ((Series.Integer) s).getIntArrayList();
+                        out.write("" + dl.get(i) + separator);
+                    } else {
+                        LongArrayList dl;
+                        dl = ((Series.Long) s).getLongArrayList();
+                        out.write("" + dl.get(i) + separator);
+                    }
+                    out.newLine();
+                }
+            }
+            out.newLine();
+            out.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            log.log(Level.SEVERE, "Error saving " + path + ioe.getMessage());
+        }
+    }
 
-		File file = new File(path);
+    private String getNumberedFile(String fileName) {
+        int index;
+        if ((index = fileName.lastIndexOf(".")) == 0)
+            return fileName + "_" + SimulationEngine.getInstance().getCurrentRunNumber();
+        else {
+            String name = fileName.substring(0, index);
+            String ext = fileName.substring(index);
+            return name + "_" + SimulationEngine.getInstance().getCurrentRunNumber() + ext;
+        }
+    }
 
-		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter(file));
-			if (withTimes) // no need to check every iteration
-				out.write("real time" + separator);
-			out.write("time" + separator);
-
-			for (var i = 0; i < absTimes.size() - 1; i++) {
-				if (withTimes)
-					out.write(descTimes.get(i) + separator);
-				out.write("" + absTimes.get(i) + separator);
-
-				for (Series s : series) {
-					if (s instanceof Series.Double) {// bloated
-						DoubleArrayList dl;
-						dl = ((Series.Double) s).getDoubleArrayList();
-						out.write("" + dl.get(i) + separator);
-					} else if (s instanceof Series.Integer) {
-						IntArrayList dl;
-						dl = ((Series.Integer) s).getIntArrayList();
-						out.write("" + dl.get(i) + separator);
-					} else {
-						LongArrayList dl;
-						dl = ((Series.Long) s).getLongArrayList();
-						out.write("" + dl.get(i) + separator);
-					}
-					out.newLine();
-				}
-			}
-			out.newLine();
-			out.close();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			log.log(Level.SEVERE, "Error saving " + path + ioe.getMessage());
-		}
-	}
-
-	private String getNumberedFile(String fileName) {
-		int index;
-		if ((index = fileName.lastIndexOf(".")) == 0)
-			return fileName + "_" + SimulationEngine.getInstance().getCurrentRunNumber();
-		else {
-			String name = fileName.substring(0, index);
-			String ext = fileName.substring(index);
-			return name + "_" + SimulationEngine.getInstance().getCurrentRunNumber() + ext;
-		}
-	}
-
-	/**
-	 * Perform one of the defined actions.
-	 *
-	 * @param type
-	 *            One of the following actions:<br>
-	 *            <i>Sim.EVENT_UPDATE</i> calls the <i>update()</i> method.<br>
-	 *            <i>TimeSeries.EVENT_SAVE</i> calls the <i>saveToFile()</i>
-	 *            method.<br>
-	 * */
-	public void onEvent(@NonNull Enum<?> type) {
-		if (type instanceof CommonEventType) {
-			switch ((CommonEventType) type) {
-				case Update -> updateSource();
-				case Save -> saveToFile();
-			}
-		}
-	}
+    /**
+     * Performs one of the defined actions.
+     *
+     * @param type a {@link CommonEventType} object.
+     * @throws NullPointerException when {@code type} is {@code null}.
+     */
+    public void onEvent(final @NonNull Enum<?> type) {
+        if (type instanceof CommonEventType) {
+            switch ((CommonEventType) type) {
+                case UPDATE -> updateSource();
+                case SAVE -> saveToFile();
+            }
+        }
+    }
 }

@@ -15,18 +15,20 @@ import java.util.Arrays;
 public abstract class MaxArrayFunction extends AbstractArrayFunction implements DoubleSource {
 
     /**
-     * Create a maximum function on an integer array source.
+     * Creates a maximum function on an integer array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public MaxArrayFunction(final @NonNull IntArraySource source) {
         super(source);
     }
 
     /**
-     * Create a maximum function on a long array source.
+     * Creates a maximum function on a long array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public MaxArrayFunction(final @NonNull LongArraySource source) {
         super(source);
@@ -36,6 +38,7 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
      * Create a maximum function on a double array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public MaxArrayFunction(final @NonNull DoubleArraySource source) {
         super(source);
@@ -48,9 +51,10 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
         protected double dmax;
 
         /**
-         * Create a maximum function on a double array source.
+         * Creates a maximum function on a double array source.
          *
          * @param source The data source.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Double(final @NonNull DoubleArraySource source) {
             super(source);
@@ -58,6 +62,8 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code data} is {@code null}.
          */
         public void apply(final double @NonNull [] data) {
             dmax = java.lang.Double.MIN_VALUE;
@@ -66,6 +72,8 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code id} is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> id) {
             return dmax;
@@ -79,14 +87,21 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
         protected long lmax;
 
         /**
-         * Create a maximum function on a long array source.
+         * Creates a maximum function on a long array source.
          *
          * @param source The data source.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Long(final @NonNull LongArraySource source) {
             super(source);
         }
 
+        /**
+         * Applies the {@code max} function to the provided array.
+         *
+         * @param data A source array of values.
+         * @throws NullPointerException when {@code data} is {@code null}.
+         */
         public void apply(final long @NonNull [] data) {
             lmax = java.lang.Long.MIN_VALUE;
             Arrays.stream(data).filter(datum -> lmax < datum).forEach(datum -> lmax = datum);
@@ -94,6 +109,8 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code id} is {@code null}.
          */
         public long getLongValue(final @NonNull Enum<?> id) {
             return lmax;
@@ -101,6 +118,8 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code variableID} is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> variableID) {
             return lmax;
@@ -114,9 +133,10 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
         protected int imax;
 
         /**
-         * Create a maximum function on an integer array source.
+         * Creates a maximum function on an integer array source.
          *
          * @param source The data source.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Integer(final @NonNull IntArraySource source) {
             super(source);
@@ -124,6 +144,8 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code data} is {@code null}.
          */
         public void apply(final int @NonNull [] data) {
             imax = java.lang.Integer.MIN_VALUE;
@@ -132,6 +154,8 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code id} is {@code null}.
          */
         public int getIntValue(final @NonNull Enum<?> id) {
             return imax;
@@ -139,6 +163,8 @@ public abstract class MaxArrayFunction extends AbstractArrayFunction implements 
 
         /**
          * {@inheritDoc}
+         *
+         * @throws NullPointerException when {@code variableID} is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> variableID) {
             return imax;

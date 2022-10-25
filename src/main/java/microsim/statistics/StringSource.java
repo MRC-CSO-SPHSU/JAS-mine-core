@@ -16,6 +16,7 @@ public interface StringSource {
      *
      * @param variableID A unique identifier for a variable.
      * @return The current double value of the required variable.
+     * @throws NullPointerException when {@code variableID} is {@code null}.
      */
     @NonNull String getStringValue(final @NonNull Enum<?> variableID);
 }

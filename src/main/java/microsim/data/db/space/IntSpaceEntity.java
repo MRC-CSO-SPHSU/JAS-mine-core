@@ -26,4 +26,12 @@ public class IntSpaceEntity implements IntegerSpaceEntity {
     @Setter
     @Getter
     private Integer value;
+
+    /**
+     * The default constructor that creates an instance only.
+     *
+     * @implSpec {@code public} to conform to JPA 3.0.
+     */
+    public IntSpaceEntity(){
+    }
 }

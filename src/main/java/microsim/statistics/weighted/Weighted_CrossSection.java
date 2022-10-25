@@ -30,13 +30,13 @@ public abstract class Weighted_CrossSection implements EventListener, UpdatableS
     public abstract void updateSource();
 
     /**
-     * {@link microsim.event.EventListener} callback function. It supports only {@link CommonEventType#Update} event.
+     * {@link microsim.event.EventListener} callback function. It supports only {@link CommonEventType#UPDATE} event.
      *
-     * @param type The action id. Only {@link CommonEventType#Update} is supported.
+     * @param type The action id. Only {@link CommonEventType#UPDATE} is supported.
      * @throws UnsupportedOperationException If actionType is not supported.
      */
     public void onEvent(final @NonNull Enum<?> type) {
-        if (type.equals(CommonEventType.Update)) updateSource();
+        if (type.equals(CommonEventType.UPDATE)) updateSource();
         else throw new UnsupportedOperationException("The SimpleStatistics object does not support " + type +
             " operation.");
     }
@@ -93,7 +93,7 @@ public abstract class Weighted_CrossSection implements EventListener, UpdatableS
          * @param source The collection containing {@link DoubleSource} object.
          */
         public Double(final @NonNull Collection<? extends Weight> source) {
-            this(source, DoubleSource.Variables.Default);
+            this(source, DoubleSource.Variables.DEFAULT);
         }
 
         /**
@@ -108,7 +108,7 @@ public abstract class Weighted_CrossSection implements EventListener, UpdatableS
                       final @NonNull Class<? extends Weight> objectClass,
                       final @NonNull String valueName, final boolean getFromMethod) {
             target = source;
-            this.valueID = DoubleSource.Variables.Default;
+            this.valueID = DoubleSource.Variables.DEFAULT;
             invoker = new DoubleInvoker(objectClass, valueName, getFromMethod);
         }
 
@@ -201,7 +201,7 @@ public abstract class Weighted_CrossSection implements EventListener, UpdatableS
          * @param source The collection containing IntSource object.
          */
         public Integer(final @NonNull Collection<? extends Weight> source) {
-            this(source, IntSource.Variables.Default);
+            this(source, IntSource.Variables.DEFAULT);
         }
 
         /**
@@ -216,7 +216,7 @@ public abstract class Weighted_CrossSection implements EventListener, UpdatableS
                        final @NonNull Class<? extends Weight> objectClass,
                        final @NonNull String valueName, final boolean getFromMethod) {
             target = source;
-            this.valueID = IntSource.Variables.Default;
+            this.valueID = IntSource.Variables.DEFAULT;
             invoker = new IntegerInvoker(objectClass, valueName, getFromMethod);
         }
 
@@ -315,7 +315,7 @@ public abstract class Weighted_CrossSection implements EventListener, UpdatableS
          * @param source The collection containing LongSource object.
          */
         public Long(final @NonNull Collection<? extends Weight> source) {
-            this(source, LongSource.Variables.Default);
+            this(source, LongSource.Variables.DEFAULT);
         }
 
         /**
@@ -330,7 +330,7 @@ public abstract class Weighted_CrossSection implements EventListener, UpdatableS
                     final @NonNull Class<? extends Weight> objectClass,
                     final @NonNull String valueName, final boolean getFromMethod) {
             target = source;
-            this.valueID = LongSource.Variables.Default;
+            this.valueID = LongSource.Variables.DEFAULT;
             invoker = new LongInvoker(objectClass, valueName, getFromMethod);
         }
 

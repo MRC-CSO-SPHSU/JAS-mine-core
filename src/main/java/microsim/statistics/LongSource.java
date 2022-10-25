@@ -7,14 +7,15 @@ import lombok.NonNull;
  */
 public interface LongSource {
     /**
-     * Return the long value corresponding to the given variableID
+     * Returns the long value corresponding to the given {@code variableID}
      *
      * @param variableID A unique identifier for a variable.
      * @return The current long value of the required variable.
+     * @throws NullPointerException when {@code variableID} is {@code null}.
      */
     long getLongValue(final @NonNull Enum<?> variableID);
 
     enum Variables {
-        Default
+        DEFAULT
     }
 }

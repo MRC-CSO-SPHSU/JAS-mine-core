@@ -26,28 +26,29 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
     protected int count = 0;
 
     /**
-     * Collect a value from the source.
+     * Collects a value from the source.
      */
     public void applyFunction() {
         count++;
     }
 
     /**
-     * {@link microsim.event.EventListener} callback function. It supports only {@link CommonEventType#Update} event.
+     * {@link microsim.event.EventListener} callback function. It supports only {@link CommonEventType#UPDATE} event.
      *
-     * @param type The action id. Only {@link CommonEventType#Update} is supported.
-     * @throws UnsupportedOperationException If actionType is not supported.
+     * @param type The action id. Only {@link CommonEventType#UPDATE} is supported.
+     * @throws SimulationRuntimeException If actionType is not supported.
+     * @throws NullPointerException       when {@code type} is {@code null}.
      */
     @Override
     public void onEvent(final @NonNull Enum<?> type) {
-        if (type.equals(CommonEventType.Update)) updateSource();
+        if (type.equals(CommonEventType.UPDATE)) updateSource();
         else throw new SimulationRuntimeException("The SimpleStatistics object does not support " + type +
             " operation.");
     }
 
     public enum Variables {
-        LastValue,
-        Max
+        LAST_VALUE,
+        MAX
     }
 
     /**
@@ -62,10 +63,11 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         private long lastRead;
 
         /**
-         * Create a basic statistic probe on a {@link LongSource} object.
+         * Creates a basic statistic probe on a {@link LongSource} object.
          *
          * @param source  The {@link LongSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Long(final @NonNull LongSource source, final @NonNull Enum<?> valueID) {
             super();
@@ -74,20 +76,21 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         }
 
         /**
-         * Create a basic statistic probe on a generic object.
+         * Creates a basic statistic probe on a generic object.
          *
          * @param source        A generic source object.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Long(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
             super();
             target = new LongInvoker(source, valueName, getFromMethod);
-            valueID = LongSource.Variables.Default;
+            valueID = LongSource.Variables.DEFAULT;
         }
 
         /**
-         * Read the source values and update statistics.
+         * Reads the source values and update statistics.
          */
         public void applyFunction() {
             super.applyFunction();
@@ -98,30 +101,30 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         }
 
         /**
-         * Return the result of a given statistic.
+         * Returns the result of a given statistic.
          *
          * @param valueID One of the {@link MaxTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
-         * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws NullPointerException when {@code valueId} is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> valueID) {
             return switch ((MaxTraceFunction.Variables) valueID) {
-                case LastValue -> (double) lastRead;
-                case Max -> (double) max;
+                case LAST_VALUE -> (double) lastRead;
+                case MAX -> (double) max;
             };
         }
 
         /**
-         * Return the result of a given statistic.
+         * Returns the result of a given statistic.
          *
          * @param valueID One of the {@link MaxTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
-         * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws NullPointerException when {@code valueID} is {@code null}.
          */
         public long getLongValue(final @NonNull Enum<?> valueID) {
             return switch ((MaxTraceFunction.Variables) valueID) {
-                case LastValue -> lastRead;
-                case Max -> max;
+                case LAST_VALUE -> lastRead;
+                case MAX -> max;
             };
         }
     }
@@ -138,10 +141,11 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         private double lastRead;
 
         /**
-         * Create a basic statistic probe on a {@link DoubleSource} object.
+         * Creates a basic statistic probe on a {@link DoubleSource} object.
          *
          * @param source  The {@link DoubleSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Double(final @NonNull DoubleSource source, final @NonNull Enum<?> valueID) {
             super();
@@ -150,20 +154,21 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         }
 
         /**
-         * Create a basic statistic probe on a generic object.
+         * Creates a basic statistic probe on a generic object.
          *
          * @param source        A generic source object.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Double(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
             super();
             target = new DoubleInvoker(source, valueName, getFromMethod);
-            valueID = DoubleSource.Variables.Default;
+            valueID = DoubleSource.Variables.DEFAULT;
         }
 
         /**
-         * Read the source values and update statistics.
+         * Reads the source values and update statistics.
          */
         public void applyFunction() {
             super.applyFunction();
@@ -173,16 +178,16 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         }
 
         /**
-         * Return the result of a given statistic.
+         * Returns the result of a given statistic.
          *
          * @param valueID One of the {@link MaxTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
-         * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> valueID) {
             return switch ((MaxTraceFunction.Variables) valueID) {
-                case LastValue -> lastRead;
-                case Max -> max;
+                case LAST_VALUE -> lastRead;
+                case MAX -> max;
             };
         }
     }
@@ -199,10 +204,11 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         private int lastRead;
 
         /**
-         * Create a basic statistic probe on a {@link IntSource} object.
+         * Creates a basic statistic probe on a {@link IntSource} object.
          *
          * @param source  The {@link IntSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Integer(final @NonNull IntSource source, final @NonNull Enum<?> valueID) {
             super();
@@ -211,20 +217,21 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         }
 
         /**
-         * Create a basic statistic probe on a generic object.
+         * Creates a basic statistic probe on a generic object.
          *
          * @param source        A generic source object.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Integer(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
             super();
             target = new IntegerInvoker(source, valueName, getFromMethod);
-            valueID = IntSource.Variables.Default;
+            valueID = IntSource.Variables.DEFAULT;
         }
 
         /**
-         * Read the source values and update statistics.
+         * Reads the source values and update statistics.
          */
         public void applyFunction() {
             super.applyFunction();
@@ -234,23 +241,23 @@ public abstract class MaxTraceFunction extends AbstractFunction implements Doubl
         }
 
         /**
-         * Return the result of a given statistic.
+         * Returns the result of a given statistic.
          *
          * @param valueID One of the {@link MaxTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
-         * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws NullPointerException when {@code valueID} is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> valueID) {
             return switch ((MaxTraceFunction.Variables) valueID) {
-                case LastValue -> lastRead;
-                case Max -> max;
+                case LAST_VALUE -> lastRead;
+                case MAX -> max;
             };
         }
 
         public int getIntValue(final @NonNull Enum<?> valueID) {
             return switch ((MaxTraceFunction.Variables) valueID) {
-                case LastValue -> lastRead;
-                case Max -> max;
+                case LAST_VALUE -> lastRead;
+                case MAX -> max;
             };
         }
     }

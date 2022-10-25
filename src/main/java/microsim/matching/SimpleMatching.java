@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
+/**
+ * The simplest matching class.
+ *
+ * @param <T>
+ */
 public class SimpleMatching<T> extends AbstractMatcher<T> implements MatchingAlgorithm<T> {
 
     private static SimpleMatching<?> simpleMatching;
@@ -17,6 +22,11 @@ public class SimpleMatching<T> extends AbstractMatcher<T> implements MatchingAlg
     private SimpleMatching() {
     }
 
+    /**
+     * A factory method.
+     *
+     * @return the instance of this class.
+     */
     public static SimpleMatching<?> getInstance() {
         if (simpleMatching == null)
             simpleMatching = new SimpleMatching<>();
@@ -24,8 +34,12 @@ public class SimpleMatching<T> extends AbstractMatcher<T> implements MatchingAlg
         return simpleMatching;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalArgumentException when the method fails to match any agents.
+     */
     public void matching(final @NonNull Collection<T> collection1, final @Nullable Predicate<T> filter1,
-                         final @Nullable Comparator<T> comparator,
                          final @NonNull Collection<T> collection2, final @Nullable Predicate<T> filter2,
                          final @NonNull MatchingScoreClosure<T> doubleClosure,
                          final @NonNull MatchingClosure<T> matching) {
@@ -55,7 +69,8 @@ public class SimpleMatching<T> extends AbstractMatcher<T> implements MatchingAlg
         }
 
         if (numberMatchesMade == 0) {
-            throw new IllegalArgumentException("Error - no matches have occurred, check the arguments of the matching method!");
+            throw new IllegalArgumentException("Error - no matches have occurred, check the arguments of the matching" +
+                " method!");
         }
     }
 }

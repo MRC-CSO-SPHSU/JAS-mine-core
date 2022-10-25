@@ -27,6 +27,7 @@ public abstract class AbstractArrayFunction extends AbstractFunction {
      * Creates a function on a double array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public AbstractArrayFunction(final @NonNull DoubleArraySource source) {
         super();
@@ -38,6 +39,7 @@ public abstract class AbstractArrayFunction extends AbstractFunction {
      * Creates a function on an integer array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public AbstractArrayFunction(final @NonNull IntArraySource source) {
         super();
@@ -49,6 +51,7 @@ public abstract class AbstractArrayFunction extends AbstractFunction {
      * Creates a function on a long array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public AbstractArrayFunction(final @NonNull LongArraySource source) {
         super();
@@ -84,7 +87,7 @@ public abstract class AbstractArrayFunction extends AbstractFunction {
      * @param data A source array of values.
      * @throws UnsupportedOperationException If the function is not able to work on double data type.
      */
-    public void apply(final double @NonNull [] data) {
+    public void apply(final double [] data) {
         throw new UnsupportedOperationException("This function class cannot be applied to arrays of double values.");
     }
 
@@ -94,7 +97,7 @@ public abstract class AbstractArrayFunction extends AbstractFunction {
      * @param data A source array of values.
      * @throws UnsupportedOperationException If the function is not able to work on double data type.
      */
-    public void apply(final int @NonNull [] data) {
+    public void apply(final int [] data) {
         throw new UnsupportedOperationException("This function class cannot be applied to arrays of integer values.");
     }
 
@@ -104,7 +107,7 @@ public abstract class AbstractArrayFunction extends AbstractFunction {
      * @param data A source array of values.
      * @throws UnsupportedOperationException If the function is not able to work on double data type.
      */
-    public void apply(final long @NonNull [] data) {
+    public void apply(final long [] data) {
         throw new UnsupportedOperationException("This function class cannot be applied to arrays of long values.");
     }
 }

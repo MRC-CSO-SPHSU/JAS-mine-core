@@ -19,10 +19,11 @@ public class Aggregate {
      * This method filters out certain objects from the provided collection according to the predicate and applies a
      * function to them.
      *
-     * @param collection A collection of objects.
-     * @param predicate  A logical predicate to filter the collection.
+     * @param collection A collection of objects, can be {@code null}.
+     * @param predicate  A logical predicate to filter the {@code collection}, can be {@code null}.
      * @param closure    A function to be applied to all filtered objects.
-     * @param <T>        A generic type.
+     * @param <T>        A generic type that usually represent agents.
+     * @throws NullPointerException when {@code closure} is {@code null}.
      */
     public static <T> void applyToFilter(final @Nullable Iterable<T> collection, final @Nullable Predicate<T> predicate,
                                          final @NonNull Closure<T> closure) {

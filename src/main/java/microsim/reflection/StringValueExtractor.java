@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 /**
- * Employs Java reflection to call objects' methods which return string values.
+ * @see AbstractValueExtractor
  */
 public class StringValueExtractor extends AbstractValueExtractor {
 
@@ -29,9 +29,9 @@ public class StringValueExtractor extends AbstractValueExtractor {
     }
 
     /**
-     * Invoke the method of the target object and return its string result.
+     * Invokes the method of the target object and return its string result.
      *
-     * @param target Object to be invoked.
+     * @param target An object containing the method.
      * @return The requested string value.
      */
     public @Nullable String getString(final @NonNull Object target) {
@@ -49,9 +49,9 @@ public class StringValueExtractor extends AbstractValueExtractor {
     }
 
     /**
-     * Invoke the method of the object passed to constructor and return its string result.
+     * Invokes the method of the object passed to constructor and return its string result.
      *
-     * @return The requested string value.
+     * @return the requested string value.
      */
     public @Nullable String getString() {
         return getString(target);

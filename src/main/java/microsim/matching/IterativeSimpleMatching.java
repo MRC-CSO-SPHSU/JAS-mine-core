@@ -8,6 +8,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * A singleton class used for matching.
+ *
+ * @param <T> A generic type representing agents.
+ */
+// todo make static?
 public class IterativeSimpleMatching<T> extends AbstractMatcher<T> implements IterativeMatchingAlgorithm<T> {
 
     private static IterativeSimpleMatching<?> iterativeMatching;
@@ -15,6 +21,11 @@ public class IterativeSimpleMatching<T> extends AbstractMatcher<T> implements It
     private IterativeSimpleMatching() {
     }
 
+    /**
+     * A factory method.
+     *
+     * @return the instance of this class.
+     */
     public static @NonNull IterativeSimpleMatching<?> getInstance() {
         if (iterativeMatching == null)
             iterativeMatching = new IterativeSimpleMatching<>();
@@ -22,8 +33,10 @@ public class IterativeSimpleMatching<T> extends AbstractMatcher<T> implements It
         return iterativeMatching;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Pair<Set<T>, Set<T>> matching(final @NonNull Collection<T> collection1, final @Nullable Predicate<T> filter1,
-                                         final @Nullable Comparator<T> comparator,
                                          final @NonNull Collection<T> collection2, final @Nullable Predicate<T> filter2,
                                          final @NonNull MatchingScoreClosure<T> doubleClosure,
                                          final @NonNull MatchingClosure<T> matching) {

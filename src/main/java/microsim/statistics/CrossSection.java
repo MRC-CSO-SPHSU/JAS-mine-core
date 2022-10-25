@@ -19,7 +19,8 @@ import java.util.stream.IntStream;
  * collection of agents.
  */
 public abstract class CrossSection implements EventListener, UpdatableSource, SourceObjectArray {
-    protected Object[] sourceList;
+    @Getter
+    protected Object[] sourceArray;
 
     protected TimeChecker timeChecker = new TimeChecker();
 
@@ -27,7 +28,14 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
     @Getter
     protected CollectionFilter filter;
 
-    private static @NonNull String builder(final @NonNull Object v, final @NonNull String name) {
+    /**
+     * A helper method, allows to build the string representation of an object.
+     *
+     * @param v    An object.
+     * @param name The object's name/
+     * @return a string.
+     */
+    private static @NonNull String builder(final Object v, final String name) {
         StringBuilder buf = new StringBuilder();
         buf.append("CrossSection.").append(name).append(" [");
         int size = Array.getLength(v) - 1;
@@ -39,24 +47,20 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
     public abstract void updateSource();
 
     /**
-     * {@link EventListener} callback function. It supports only {@link CommonEventType#Update} event.
+     * {@link EventListener} callback function. It supports only {@link CommonEventType#UPDATE} event.
      *
-     * @param type The action id. Only {@link CommonEventType#Update} is supported.
+     * @param type The action id. Only {@link CommonEventType#UPDATE} is supported.
      * @throws UnsupportedOperationException If actionType is not supported.
      */
     public void onEvent(final @NonNull Enum<?> type) {
-        if (type.equals(CommonEventType.Update)) updateSource();
+        if (type.equals(CommonEventType.UPDATE)) updateSource();
         else
             throw new UnsupportedOperationException("The SimpleStatistics object does not support " + type +
                 " operation.");
     }
 
-    public @NonNull Object[] getSourceArray() {
-        return sourceList;
-    }
-
     /**
-     * Return the current status of the time checker. A time checker avoid the object to update more than one time per
+     * Returns the current status of the time checker. A time checker avoid the object to update more than one time per
      * simulation step. The default value is enabled (true).
      *
      * @return True if the computer is currently checking time before update cached data, false if disabled.
@@ -66,7 +70,7 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
     }
 
     /**
-     * Set the current status of the time checker. A time checker avoid the object to update more than one time per
+     * Sets the current status of the time checker. A time checker avoid the object to update more than one time per
      * simulation step. The default value is enabled (true).
      *
      * @param b True if the computer is currently checking time before update cached data, false if disabled.
@@ -83,10 +87,11 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
         protected Enum<?> valueID;
 
         /**
-         * Create a statistic probe on a collection of {@link DoubleSource} objects.
+         * Creates a statistic probe on a collection of {@link DoubleSource} objects.
          *
          * @param source  The collection containing {@link DoubleSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Double(final @NonNull Collection<?> source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -94,28 +99,30 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
         }
 
         /**
-         * Create a statistic probe on a collection of {@link DoubleSource} objects.
-         * It uses the {@link DoubleSource.Variables#Default} variable id.
+         * Creates a statistic probe on a collection of {@link DoubleSource} objects. It uses the
+         * {@link DoubleSource.Variables#DEFAULT} variable id.
          *
          * @param source The collection containing {@link DoubleSource} object.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Double(final @NonNull Collection<?> source) {
             target = source;
-            this.valueID = DoubleSource.Variables.Default;
+            this.valueID = DoubleSource.Variables.DEFAULT;
         }
 
         /**
-         * Create a basic statistic probe on a collection of objects.
+         * Creates a basic statistic probe on a collection of objects.
          *
          * @param source        A collection of generic objects.
          * @param objectClass   The class of the objects contained by collection source.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Double(final @NonNull Collection<?> source, final @NonNull Class<?> objectClass,
                       final @NonNull String valueName, final boolean getFromMethod) {
             target = source;
-            this.valueID = DoubleSource.Variables.Default;
+            this.valueID = DoubleSource.Variables.DEFAULT;
             invoker = new DoubleInvoker(objectClass, valueName, getFromMethod);
         }
 
@@ -127,11 +134,14 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
             return builder(valueList, "Double");
         }
 
+        /**
+         * Updates the state of the object when it's not up-to-date.
+         */
         public void updateSource() {
             if (timeChecker.isUpToDate()) return;
 
             valueList = new double[target.size()];
-            sourceList = new Object[valueList.length];
+            sourceArray = new Object[valueList.length];
 
             int i = 0;
             if (filter != null) {
@@ -139,27 +149,27 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
                     for (Object obj : target) {
                         if (filter.isFiltered(obj)) {
                             valueList[i] = invoker.getDouble(obj);
-                            sourceList[i++] = obj;
+                            sourceArray[i++] = obj;
                         }
                     }
                 else
                     for (Object obj : target) {
                         if (filter.isFiltered(obj)) {
                             valueList[i] = ((DoubleSource) obj).getDoubleValue(valueID);
-                            sourceList[i++] = obj;
+                            sourceArray[i++] = obj;
                         }
                     }
                 valueList = cern.mateba.Arrays.trimToCapacity(valueList, i);
-                sourceList = cern.mateba.Arrays.trimToCapacity(sourceList, i);
+                sourceArray = cern.mateba.Arrays.trimToCapacity(sourceArray, i);
             } else if (invoker != null)
                 for (Object o : target) {
                     valueList[i] = invoker.getDouble(o);
-                    sourceList[i++] = o;
+                    sourceArray[i++] = o;
                 }
             else
                 for (Object o : target) {
                     valueList[i] = ((DoubleSource) o).getDoubleValue(valueID);
-                    sourceList[i++] = o;
+                    sourceArray[i++] = o;
                 }
 
         }
@@ -174,10 +184,11 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
         protected Enum<?> valueID;
 
         /**
-         * Create a statistic probe on a collection of {@link LongSource} objects.
+         * Creates a statistic probe on a collection of {@link LongSource} objects.
          *
          * @param source  The collection containing {@link LongSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Long(final @NonNull Collection<?> source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -185,28 +196,30 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
         }
 
         /**
-         * Create a statistic probe on a collection of LongSource objects.
-         * It uses the {@link LongSource.Variables#Default} variable id.
+         * Creates a statistic probe on a collection of LongSource objects. It uses the
+         * {@link LongSource.Variables#DEFAULT} variable id.
          *
          * @param source The collection containing {@link LongSource} object.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Long(final @NonNull Collection<?> source) {
             target = source;
-            this.valueID = LongSource.Variables.Default;
+            this.valueID = LongSource.Variables.DEFAULT;
         }
 
         /**
-         * Create a basic statistic probe on a collection of objects.
+         * Creates a basic statistic probe on a collection of objects.
          *
          * @param source        A collection of generic objects.
          * @param objectClass   The class of the objects contained by collection source.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Long(final @NonNull Collection<?> source, final @NonNull Class<?> objectClass,
                     final @NonNull String valueName, final boolean getFromMethod) {
             target = source;
-            this.valueID = LongSource.Variables.Default;
+            this.valueID = LongSource.Variables.DEFAULT;
             invoker = new LongInvoker(objectClass, valueName, getFromMethod);
         }
 
@@ -222,11 +235,14 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
             return builder(valueList, "Long");
         }
 
+        /**
+         * Updates the state of the object when it's not up-to-date.
+         */
         public void updateSource() {
             if (timeChecker.isUpToDate()) return;
 
             valueList = new long[target.size()];
-            sourceList = new Object[valueList.length];
+            sourceArray = new Object[valueList.length];
 
             int i = 0;
             if (filter != null) {
@@ -234,27 +250,27 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
                     for (Object obj : target) {
                         if (filter.isFiltered(obj)) {
                             valueList[i] = invoker.getLong(obj);
-                            sourceList[i++] = obj;
+                            sourceArray[i++] = obj;
                         }
                     }
                 else
                     for (Object obj : target) {
                         if (filter.isFiltered(obj)) {
                             valueList[i] = ((LongSource) obj).getLongValue(valueID);
-                            sourceList[i++] = obj;
+                            sourceArray[i++] = obj;
                         }
                     }
                 valueList = cern.mateba.Arrays.trimToCapacity(valueList, i);
-                sourceList = cern.mateba.Arrays.trimToCapacity(sourceList, i);
+                sourceArray = cern.mateba.Arrays.trimToCapacity(sourceArray, i);
             } else if (invoker != null)
                 for (Object o : target) {
                     valueList[i] = invoker.getLong(o);
-                    sourceList[i++] = o;
+                    sourceArray[i++] = o;
                 }
             else
                 for (Object o : target) {
                     valueList[i] = ((LongSource) o).getLongValue(valueID);
-                    sourceList[i++] = o;
+                    sourceArray[i++] = o;
                 }
 
         }
@@ -268,10 +284,11 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
         protected Enum<?> valueID;
 
         /**
-         * Create a statistic probe on a collection of {@link IntSource} objects.
+         * Creates a statistic probe on a collection of {@link IntSource} objects.
          *
          * @param source  The collection containing {@link IntSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Integer(final @NonNull Collection<?> source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -280,13 +297,14 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
 
         /**
          * Create a statistic probe on a collection of {@link IntSource} objects.
-         * It uses the {@link IntSource.Variables#Default} variable id.
+         * It uses the {@link IntSource.Variables#DEFAULT} variable id.
          *
          * @param source The collection containing {@link IntSource} object.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Integer(final @NonNull Collection<?> source) {
             target = source;
-            this.valueID = IntSource.Variables.Default;
+            this.valueID = IntSource.Variables.DEFAULT;
         }
 
         /**
@@ -296,11 +314,12 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
          * @param objectClass   The class of the objects contained by collection source.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Integer(final @NonNull Collection<?> source, final @NonNull Class<?> objectClass,
                        final @NonNull String valueName, final boolean getFromMethod) {
             target = source;
-            this.valueID = IntSource.Variables.Default;
+            this.valueID = IntSource.Variables.DEFAULT;
             invoker = new IntegerInvoker(objectClass, valueName, getFromMethod);
         }
 
@@ -316,11 +335,14 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
             return builder(valueList, "Int");
         }
 
+        /**
+         * Updates the state of the object when it's not up-to-date.
+         */
         public void updateSource() {
             if (timeChecker.isUpToDate()) return;
 
             valueList = new int[target.size()];
-            sourceList = new Object[valueList.length];
+            sourceArray = new Object[valueList.length];
 
             int i = 0;
             if (filter != null) {
@@ -328,27 +350,27 @@ public abstract class CrossSection implements EventListener, UpdatableSource, So
                     for (Object obj : target) {
                         if (filter.isFiltered(obj)) {
                             valueList[i] = invoker.getInt(obj);
-                            sourceList[i++] = obj;
+                            sourceArray[i++] = obj;
                         }
                     }
                 else
                     for (Object obj : target) {
                         if (filter.isFiltered(obj)) {
                             valueList[i] = ((IntSource) obj).getIntValue(valueID);
-                            sourceList[i++] = obj;
+                            sourceArray[i++] = obj;
                         }
                     }
                 valueList = cern.mateba.Arrays.trimToCapacity(valueList, i);
-                sourceList = cern.mateba.Arrays.trimToCapacity(sourceList, i);
+                sourceArray = cern.mateba.Arrays.trimToCapacity(sourceArray, i);
             } else if (invoker != null)
                 for (Object o : target) {
                     valueList[i] = invoker.getInt(o);
-                    sourceList[i++] = o;
+                    sourceArray[i++] = o;
                 }
             else
                 for (Object o : target) {
                     valueList[i] = ((IntSource) o).getIntValue(valueID);
-                    sourceList[i++] = o;
+                    sourceArray[i++] = o;
                 }
         }
     }

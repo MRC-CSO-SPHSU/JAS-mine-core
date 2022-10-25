@@ -23,4 +23,12 @@ public class CoefficientEntityKey implements Serializable {
     @Setter
     @Getter
     private Long simulationRun;
+
+    /**
+     * The default constructor that creates an instance only.
+     *
+     * @implSpec {@code public} to conform to JPA 3.0.
+     */
+    public CoefficientEntityKey(){
+    }
 }

@@ -21,7 +21,7 @@ public class TimeChecker {
      * The method checks if a call has been already done at current simulation time. In case it has not yet invoked it
      * updates to current time.
      *
-     * @return True if the method has not yet been invoked at the current time, false otherwise
+     * @return {@code true} if the method has not yet been invoked at the current time, {@code false} otherwise
      */
     public boolean isUpToDate() {
         if (!enabled) return false;

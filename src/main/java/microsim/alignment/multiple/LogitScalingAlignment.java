@@ -19,27 +19,27 @@ import static java.lang.String.format;
 
 /**
  * Multinomial alignment methods, where there is in general a set 'A' (>=2) of possible outcomes/states to align.
- * This algorithm is called *Logit Scaling* and is based on the minimization of the information loss (relative entropy).
- * This is an abstract class which can be applied to both weighted and non-weighted cases. Additionally, it can be used
- * in conventional binary alignment problems.
+ * This algorithm is called <em>Logit Scaling</em> and is based on the minimization of the information loss (relative
+ * entropy). This class can be applied to both weighted and non-weighted collections of agents. Additionally, it can be
+ * used in conventional binary alignment problems.
  *
- * @param <T> The Type parameter usually representing the agent class.
- * @implSpec Getters are introduced with the purpose of documenting corresponding variables via {@code lombok}. This
- * way, their meaning is not hidden in commented lines, but accessible with the help of Javadoc. Do *NOT*
- * remove them.
+ * @param <T> The type parameter usually representing the agent class.
  * @implNote The design of this class suboptimal at the moment to make all class implementations share as much code as
  * possible. In particular, when agents have no weight, they all automatically get one that is equal to 1.
  * This code extends the original algorithm by adding the case of weighted samples. It also does add a filter
  * for the whole population to align only the relevant subpopulation.
  * <p>
  * In the degenerate case when all probabilities are given as open-point distributions this algorithm fails to
- * converge. This happens due to the fact it conserves 0s and 1s, thus, the entire array of probabilities does
- * not change.
+ * converge. This happens due to the fact it conserves {@code 0}s and {@code 1}s, thus, the entire array of
+ * probabilities does not change.
  * @see <a href="https://ideas.repec.org/a/ijm/journl/v9y2016i3p89-102.html">Peter Stephensen, A General Method
  * for Alignment in Microsimulation models, International Journal of Microsimulation (2016) 9(3) 89-102</a>
  */
 public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
-    final static double ERROR_THRESHOLD = 1e-15;
+    /**
+     * Constant: {@value}.
+     */
+    public final static double ERROR_THRESHOLD = 1e-15;
 
     /**
      * The expected discrete probability distribution.
@@ -117,7 +117,7 @@ public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
     double[] tempAgents;
 
     /**
-     * A temporary array containing sums of probabilities, i.e., 1 if there is no weights, or weights otherwise.
+     * A temporary array containing sums of probabilities, i.e., {@code 1} if there is no weights, or weights otherwise.
      */
     double[] targetProbabilitySums;
 
@@ -128,12 +128,17 @@ public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
      * @param agents                        A collection of agents of a given type. Most commonly, every agent is a
      *                                      person, however, this class does not limit its usage to humans only.
      * @param filter                        A filter to select a subpopulation from a given collection of
-     *                                      {@code agents}.
+     *                                      {@code agents}, can accept {@code null} values.
      * @param closure                       An object that specifies how to get the (unaligned) probability of the agent
      *                                      and how to set the result of the aligned probability.
      * @param targetProbabilityDistribution The target discrete probability distribution. Means of the aligned
      *                                      probabilities must be equal to these values.
-     * @implNote The total number of iterations defaults to 50. The error threshold of the numerical scheme is 1e-15.
+     * @throws NullPointerException when {@code agents}, {@code closure}, or {@code targetProbabilityDistribution}, or
+     *                              any combination of them are null.
+     * @implSpec When the list of agents is empty, no alignment happens. The same works for cases when filtering
+     * produces an empty list.
+     * @implNote The total number of iterations defaults to 50. The error threshold of the numerical scheme is
+     * {@code 1e-15}.
      */
     final public void align(final @NonNull Collection<T> agents, final @Nullable Predicate<T> filter,
                             final @NonNull AlignmentMultiProbabilityClosure<T> closure,
@@ -202,11 +207,12 @@ public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
     }
 
     /**
-     * Checks if all agents have corresponding weights, i.e., {@link Weight} implemented.
+     * Checks if all agents have corresponding weights, i.e., {@link Weight} is implemented.
      *
      * @param agentCollection A collection of objects representing agents.
      * @return {@code true} when all of them have weights, {@code false} if none of them have.
      * @throws IllegalArgumentException when {@code agentCollection} is empty.
+     * @throws NullPointerException     when {@code agentCollection} is {@code null}.
      * @implNote Introduced to avoid all the hassle with multiple classes. Mixes of weighted and non-weighted objects
      * are not possible. In the case of an empty list returns false for the sake of consistency. The actual value is
      * irrelevant in this case since any empty agent list causes early exit.
@@ -221,7 +227,7 @@ public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
     /**
      * Extracts weights - if any - from individual agents and stores them in a single array.
      *
-     * @return An array with weights or {@code null}.
+     * @return an array with weights or {@code null}.
      */
     double @Nullable [] extractWeights() {
         int l = filteredAgentList.size();
@@ -232,8 +238,8 @@ public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
     }
 
     /**
-     * Does a basic input data validation. Sees that probabilities are in range in [0,1], their sum is not greater than
-     * 1; also checks that weights and precision are strictly positive. Steps in before weight scaling.
+     * Does a basic input data validation. Sees that probabilities are in range in [0,1], their sum is <em>exactly</em>
+     * 1 ; also checks that weights and precision are strictly positive. Steps in before weight scaling.
      *
      * @throws IllegalArgumentException When sanity checks fail:
      *                                  {@code totalChoiceNumber} is 0 or 1,
@@ -242,7 +248,7 @@ public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
      *                                  any element of {@code weights} is {@code <= 0, NaN, or Inf},
      *                                  {@code probabilities} contains values out of range [0,1],
      *                                  for any agent the sum of all probabilities is not 1,
-     *                                  impossible event, i.e., for *every* agent the probability of a particular
+     *                                  impossible event, i.e., for <em>every</em> agent the probability of a particular
      *                                  outcome is strictly zero,
      *                                  the probability array is binary (contains 0 and 1 only) as the method does not
      *                                  converge.
@@ -318,6 +324,7 @@ public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
      * @param closure An instance of implementation of
      *                {@link microsim.alignment.multiple.AlignmentMultiProbabilityClosure}.
      * @implNote No need to check for division by zero as all such values are filtered out earlier.
+     * @throws NullPointerException when {@code closure} is {@code null}.
      */
     final void correctProbabilities(final @NonNull AlignmentMultiProbabilityClosure<T> closure) {
         if (weights != null) for (var i = 0; i < totalAgentNumber; i++)
@@ -341,8 +348,6 @@ public class LogitScalingAlignment<T> implements AlignmentUtils<T> {
     /**
      * Generates an array with gamma values.
      *
-     * @implSpec {@code agentSizeArray} is introduced to avoid extra memory handling as this method is called during
-     * every iteration.
      * @implNote No division by zero is handled, it's assumed all data of such kind is not valid and thus blocked from
      * processing earlier.
      */

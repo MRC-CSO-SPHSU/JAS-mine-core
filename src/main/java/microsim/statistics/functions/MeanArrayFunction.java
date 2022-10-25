@@ -6,6 +6,7 @@ import microsim.statistics.DoubleSource;
 import microsim.statistics.IntArraySource;
 import microsim.statistics.LongArraySource;
 import jamjam.Mean;
+
 import java.util.Arrays;
 
 /**
@@ -17,27 +18,30 @@ public class MeanArrayFunction extends AbstractArrayFunction implements DoubleSo
     protected double mean;
 
     /**
-     * Create a mean function on an integer array source.
+     * Creates a mean function on an integer array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public MeanArrayFunction(final @NonNull IntArraySource source) {
         super(source);
     }
 
     /**
-     * Create a mean function on a long array source.
+     * Creates a mean function on a long array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public MeanArrayFunction(final @NonNull LongArraySource source) {
         super(source);
     }
 
     /**
-     * Create a mean function on a double array source.
+     * Creates a mean function on a double array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public MeanArrayFunction(final @NonNull DoubleArraySource source) {
         super(source);
@@ -45,6 +49,7 @@ public class MeanArrayFunction extends AbstractArrayFunction implements DoubleSo
 
     /**
      * {@inheritDoc}
+     * @throws NullPointerException when {@code data} is {@code null}.
      */
     public void apply(final double @NonNull [] data) {
         mean = Mean.mean(data);
@@ -52,6 +57,7 @@ public class MeanArrayFunction extends AbstractArrayFunction implements DoubleSo
 
     /**
      * {@inheritDoc}
+     * @throws NullPointerException when {@code data} is {@code null}.
      */
     public void apply(final int @NonNull [] data) {
         mean = data.length != 0 ? (double) Arrays.stream(data).asLongStream().sum() / data.length : 0.;
@@ -59,6 +65,8 @@ public class MeanArrayFunction extends AbstractArrayFunction implements DoubleSo
 
     /**
      * {@inheritDoc}
+     * @throws NullPointerException when {@code data} is {@code null}.
+     *
      */
     public void apply(final long @NonNull [] data) {
         mean = data.length != 0 ? (double) Arrays.stream(data).sum() / data.length : 0.;
@@ -66,6 +74,7 @@ public class MeanArrayFunction extends AbstractArrayFunction implements DoubleSo
 
     /**
      * {@inheritDoc}
+     * @throws NullPointerException when {@code data} is {@code null}.
      */
     public double getDoubleValue(final @NonNull Enum<?> variableID) {
         return mean;

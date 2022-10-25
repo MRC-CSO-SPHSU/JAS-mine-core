@@ -21,9 +21,11 @@ public class MovingAverageArrayFunction extends AbstractArrayFunction implements
     protected int window;
 
     /**
-     * Create a count function on an integer array source.
+     * Creates a count function on an integer array source.
      *
      * @param source The data source.
+     * @throws NullPointerException     when {@code source} is {@code null}.
+     * @throws IllegalArgumentException when {@code windowSize} is {@code < 1}.
      */
     public MovingAverageArrayFunction(final @NonNull IntArraySource source, final int windowSize) {
         super(source);
@@ -32,9 +34,11 @@ public class MovingAverageArrayFunction extends AbstractArrayFunction implements
     }
 
     /**
-     * Create a count function on a long array source.
+     * Creates a count function on a long array source.
      *
      * @param source The data source.
+     * @throws NullPointerException     when {@code source} is {@code null}.
+     * @throws IllegalArgumentException when {@code windowSize} is {@code < 1}.
      */
     public MovingAverageArrayFunction(final @NonNull LongArraySource source, final int windowSize) {
         super(source);
@@ -46,6 +50,8 @@ public class MovingAverageArrayFunction extends AbstractArrayFunction implements
      * Create a count function on a double array source.
      *
      * @param source The data source.
+     * @throws NullPointerException     when {@code source} is {@code null}.
+     * @throws IllegalArgumentException when {@code windowSize} is {@code < 1}.
      */
     public MovingAverageArrayFunction(final @NonNull DoubleArraySource source, final int windowSize) {
         super(source);
@@ -55,6 +61,8 @@ public class MovingAverageArrayFunction extends AbstractArrayFunction implements
 
     /**
      * {@inheritDoc}
+     *
+     * @throws NullPointerException when {@code data} is {@code null}.
      */
     public void apply(final double @NonNull [] data) {
         val firstElement = Math.max(data.length - window, 0);
@@ -64,6 +72,8 @@ public class MovingAverageArrayFunction extends AbstractArrayFunction implements
 
     /**
      * {@inheritDoc}
+     *
+     * @throws NullPointerException when {@code data} is {@code null}.
      */
     public void apply(final int @NonNull [] data) {
         val firstElement = Math.max(data.length - window, 0);
@@ -73,6 +83,8 @@ public class MovingAverageArrayFunction extends AbstractArrayFunction implements
 
     /**
      * {@inheritDoc}
+     *
+     * @throws NullPointerException when {@code data} is {@code null}.
      */
     public void apply(final long @NonNull [] data) {
         val firstElement = Math.max(data.length - window, 0);
@@ -82,6 +94,8 @@ public class MovingAverageArrayFunction extends AbstractArrayFunction implements
 
     /**
      * {@inheritDoc}
+     *
+     * @throws NullPointerException when {@code data} is {@code null}.
      */
     public double getDoubleValue(final @NonNull Enum<?> variableID) {
         return mean;

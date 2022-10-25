@@ -17,11 +17,12 @@ import java.util.List;
  */
 public interface AlignmentUtils<T> {
     /**
-     * Sorts out {@code agents} according to the filter requirements.
+     * Sorts out {@code agents} of type {@code <T>} according to the filter requirements.
      *
      * @param agents An unsorted collection of agents.
-     * @param filter One predicate to filter them all (or null).
-     * @return a filtered list of agents.
+     * @param filter One predicate to filter them all or {@code null} if there is no need to filter the agents.
+     * @return a filtered list of agents, or the same collection transformed to a list when the filter is {@code null};
+     * always not {@code null}.
      * @throws NullPointerException when the  {@code agents} collection is null.
      */
     @NonNull

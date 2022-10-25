@@ -8,14 +8,15 @@ import lombok.NonNull;
 public interface DoubleSource {
 
     /**
-     * Return the double value corresponding to the given variableID
+     * Returns the double value corresponding to the given variableID
      *
      * @param variableID A unique identifier for a variable.
      * @return The current double value of the required variable.
+     * @throws NullPointerException when {@code variableID} is {@code null}.
      */
     double getDoubleValue(final @NonNull Enum<?> variableID);
 
     enum Variables {
-        Default
+        DEFAULT
     }
 }

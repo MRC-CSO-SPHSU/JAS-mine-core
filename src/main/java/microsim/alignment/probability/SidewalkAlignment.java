@@ -20,7 +20,17 @@ import static jamjam.Sum.cumulativeSum;
  * @param <T>
  */
 public class SidewalkAlignment<T> implements AlignmentUtils<T> {
-    // todo docs, input validation, test, original research
+
+    /**
+     * The method calibrates the probabilities through nonlinear transformation in order to confine the probability
+     * within the range of 0 and 1.
+     *
+     * @param agents            A collection of agents.
+     * @param filter            A logical filter to filter out agents that don't match certain criteria, can be null.
+     * @param closure           A closure to manipulate probabilities of the agents.
+     * @param targetProbability The target probability value that the method converges to.
+     * @throws NullPointerException when {@code agents}, or {@code closure}, or both are {@code null}.
+     */
     public void align(final @NonNull Collection<T> agents, final @Nullable Predicate<T> filter,
                       final @NonNull AlignmentProbabilityClosure<T> closure, final double targetProbability) {
         if (targetProbability < 0. || targetProbability > 1.)
@@ -30,7 +40,7 @@ public class SidewalkAlignment<T> implements AlignmentUtils<T> {
         if (list.size() == 0)
             return;
 
-        Collections.shuffle(list, SimulationEngine.getRnd());// fixme does not generate 1
+        Collections.shuffle(list, SimulationEngine.getRnd());
 
         val cumulativeProb = cumulativeSum(list.stream().mapToDouble(closure::getProbability).toArray());
         val cProbTruncated = IntStream.range(0, list.size()).map(i -> (int) cumulativeProb[i]).toArray();

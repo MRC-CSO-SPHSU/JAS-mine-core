@@ -12,7 +12,7 @@ package microsim.statistics;
  */
 public interface UpdatableSource {
     /**
-     * Force the source to update its currently cached data.
+     * Forces the source to update its currently cached data.
      */
     void updateSource();
 }

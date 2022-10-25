@@ -29,12 +29,20 @@ public class PanelEntityKey implements Serializable {
     @Getter
     private long simulationRun;
 
+    /**
+     * The default constructor that creates an instance only.
+     *
+     * @implSpec {@code public} to conform to JPA 3.0.
+     */
     public PanelEntityKey() {
-        super();
     }
 
+    /**
+     * This constructor assigns the {@code id} value.
+     *
+     * @param id An entity id.
+     */
     public PanelEntityKey(final long id) {
-        super();
         this.id = id;
     }
 }

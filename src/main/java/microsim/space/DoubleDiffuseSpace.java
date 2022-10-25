@@ -9,8 +9,8 @@ import microsim.exception.SimulationRuntimeException;
 
 import java.util.Arrays;
 
-import static microsim.space.DoubleDiffuseSpace.Verbs.Diffuse;
-import static microsim.space.DoubleDiffuseSpace.Verbs.Update;
+import static microsim.space.DoubleDiffuseSpace.Verbs.DIFFUSE;
+import static microsim.space.DoubleDiffuseSpace.Verbs.UPDATE;
 
 /**
  * Discrete 2nd order approximation of 2d diffusion with evaporation.
@@ -299,10 +299,10 @@ public class DoubleDiffuseSpace extends DoubleSpace implements EventListener {
 
     public void onEvent(final @NonNull Enum<?> type) {
         switch ((Verbs) type) {
-            case Diffuse -> diffuse();
-            case Update -> update();
+            case DIFFUSE -> diffuse();
+            case UPDATE -> update();
             default -> throw new SimulationRuntimeException(
-                "The %s supports only %s and %s operations".formatted(getClass().getName(), Update, Diffuse));
+                "The %s supports only %s and %s operations".formatted(getClass().getName(), UPDATE, DIFFUSE));
         }
     }
 
@@ -318,6 +318,6 @@ public class DoubleDiffuseSpace extends DoubleSpace implements EventListener {
     }
 
     public enum Verbs {
-        Diffuse, Update
+        DIFFUSE, UPDATE
     }
 }

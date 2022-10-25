@@ -6,26 +6,34 @@ import microsim.exception.SimulationException;
 
 import java.util.Arrays;
 
+/**
+ * An abstract class that describes the structure of a simulation event.
+ */
 public abstract class Event implements Comparable<Event> {
 
     private static long eventCounter = Long.MIN_VALUE;
+
     /**
      * Designed to break randomness of cases when time and ordering of two events is the same. In this case, the first
      * event that was scheduled will be fired first in the schedule.
      */
     final private long eventNumber = eventCounter++;
+
     /**
      * Get the next firing absolute time.
      */
     @Getter
     protected double time;
+
     /**
      * If two events have time fields with equal value, their ordering fields will determine the order in which the
      * events are fired, with lower ordering values fired before high ordering values. If ordering fields are also
      * equal, the event that was scheduled first will be fired first in the schedule (determined comparing the
      * eventNumber field).
      */
+    @Getter
     protected int ordering;
+
     /**
      * Get the loop length.
      */
@@ -57,8 +65,12 @@ public abstract class Event implements Comparable<Event> {
      * with the higher time field. If two events have time fields with equal value, their ordering fields will determine
      * the order in which the events are fired, with lower ordering values fired before high ordering values. If
      * ordering fields are also equal, the first event that was scheduled will be fired first.
+     *
+     * @param e Another object of the same type to compare to.
+     * @throws NullPointerException when {@code e} is {@code null}.
      */
     public int compareTo(final @NonNull Event e) {
+        // todo don't use floats for that
         //Ross Richardson: See Joshua Bloch's Effective Java (2nd Ed.) page 65.  "For floating-point fields, use Double.compare..."
         int compareDouble = Double.compare(time, e.getTime());
         if (compareDouble > 0) return 1;
@@ -87,9 +99,11 @@ public abstract class Event implements Comparable<Event> {
     }
 
     /**
-     * Get the ordering of the event's next firing.
+     * A helper method to print out the whole exception.
+     *
+     * @param e An {@link Exception} object.
      */
-    public int getOrdering() {
-        return ordering;
+    void printStackTrace(final Exception e) {
+        Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).forEachOrdered(System.out::println);
     }
 }

@@ -18,7 +18,7 @@ import static java.lang.Math.signum;
 import static microsim.statistics.regression.RegressionUtils.event;
 
 /**
- * Align the population by resampling of data with (or without) corresponding weights. This involves picking an agent
+ * Aligns the population by resampling of data with (or without) corresponding weights. This involves picking an agent
  * from the relevant collection at random with a probability that depends on an associated weight in the case of
  * weighted agents or uniformly otherwise. The chosen agent then undergoes resampling of its relevant attribute (as
  * specified by the {@link AlignmentOutcomeClosure}). This process is continued until either the alignment target is
@@ -33,7 +33,10 @@ import static microsim.statistics.regression.RegressionUtils.event;
  * Agent-Based Microsimulation of Labour Supply – An Application to Italy. Comput Econ 27, 63–88 (2006). </a>
  */
 public class ResamplingAlignment<T> implements AlignmentUtils<T> {
-    final static int avgResampleAttempts = 20;
+    /**
+     * Constant: {@value}.
+     */
+    public final static int avgResampleAttempts = 20;
     double[] weights = null;
     double effectiveSampleSize = 0.;
 
@@ -70,16 +73,16 @@ public class ResamplingAlignment<T> implements AlignmentUtils<T> {
      *                              In the case of the alignment algorithm, {@link Weight#getWeight()} must return a
      *                              non-negative value.
      * @param filter                Filters the {@code agents} parameter so that only the relevant sub-population of
-     *                              agents is sampled.
+     *                              agents is sampled, can be {@code null}.
      * @param closure               {@link AlignmentOutcomeClosure} that specifies how to define the outcome of the
      *                              agent and how to resample it.
-     * @param targetShare           The target share of the relevant sub-population (specified as a proportion of the
+     * @param targetShare           The target share of the relevant subpopulation (specified as a proportion of the
      *                              filtered population) for which the outcome (defined by the
      *                              {@link AlignmentOutcomeClosure}) must be true.
      * @param maxResamplingAttempts The maximum number of attempts to resample before terminating the alignment.
      *                              Introduced for situations when the resampling (as defined by the
      *                              {@link AlignmentOutcomeClosure}) is unable to alter the outcomes of enough agents,
-     *                              due to the nature of the sub-population and the definition of the outcome (i.e. if
+     *                              due to the nature of the subpopulation and the definition of the outcome (i.e. if
      *                              agents' attributes are so far away from a binary outcome threshold boundary, that
      *                              the probability of enough of them switching to the desired outcome is vanishingly
      *                              small). If lower than the size of the subset of the population whose outcomes need
@@ -90,6 +93,7 @@ public class ResamplingAlignment<T> implements AlignmentUtils<T> {
      *                              resampled up to a maximum of 20 times on average in order to change their outcome,
      *                              before the alignment algorithm will give up and terminate.
      * @throws IllegalArgumentException when {@code targetShare} is out of {@code [0,1]} range.
+     * @throws NullPointerException     when {@code agents}, or {@code closure}, or both are {@code null}.
      * @implSpec {@code targetNumber} is rounded down for the sake of consistency.
      */
     public void align(final @NonNull Collection<T> agents, final @Nullable Predicate<T> filter,
@@ -117,7 +121,7 @@ public class ResamplingAlignment<T> implements AlignmentUtils<T> {
      *                              {@link Weight} interface by providing a getWeight() method. In the case of the
      *                              alignment algorithm, getWeight() must return a positive value.
      * @param filter                Filters the {@code agents} so that only the relevant subpopulation of agents is
-     *                              sampled.
+     *                              sampled, can be null.
      * @param closure               {@link AlignmentOutcomeClosure} that specifies how to define the outcome of the
      *                              agent and how to resample it.
      * @param targetNumber          The target number of the filtered population for which the outcome (defined by the
@@ -136,6 +140,7 @@ public class ResamplingAlignment<T> implements AlignmentUtils<T> {
      *                              resampled up to a maximum of 20 times on average in order to change their outcome,
      *                              before the alignment algorithm will give up and terminate.
      * @throws IllegalArgumentException when targetNumber is negative or exceeds the population size.
+     * @throws NullPointerException     when {@code agents}, or {@code closure}, or both are {@code null}.
      */
     public void align(final @NonNull Collection<T> agents, final @Nullable Predicate<T> filter,
                       final @NonNull AlignmentOutcomeClosure<T> closure, final int targetNumber,
@@ -163,6 +168,7 @@ public class ResamplingAlignment<T> implements AlignmentUtils<T> {
      * @param targetNumber          The target sum of positive outcomes.
      * @param maxResamplingAttempts The total number of resampling attempts, if reached, the method picks randomly
      *                              another agent.
+     * @throws NullPointerException when {@code list}, or {@code closure}. or both are {@code null}.
      * @implSpec The list argument here is already filtered for the relevant agents in a corresponding {@code align}
      * method.
      * @implSpec Consistent delta comparison for all cases: compare to zero every time.
@@ -260,10 +266,11 @@ public class ResamplingAlignment<T> implements AlignmentUtils<T> {
      * small, decrements the magnitude of delta so that it gets even closer to {@code 0}. This only happens if
      * addition/subtraction of the corresponding weight makes its absolute magnitude even smaller.
      *
-     * @param agent      A weighted agent if any.
+     * @param agent      A weighted agent if any, can be {@code null}.
      * @param closure    A closure to operate the agent.
      * @param deltaValue The value of delta.
      * @return updated delta.
+     * @throws NullPointerException when {@code closure} is {@code null}.
      */
     private double finalAgentAdjustment(final @Nullable T agent, final @NonNull AlignmentOutcomeClosure<T> closure,
                                         double deltaValue) {
@@ -310,7 +317,8 @@ public class ResamplingAlignment<T> implements AlignmentUtils<T> {
      * @param closure A closure object to get access to attributes of agents.
      * @param max     The maximum number of resampling attempts.
      * @param delta   The delta value
-     * @return an ArrayList with final values of {@code count}, {@code max}, and {@code delta}.
+     * @return an ArrayList with final values of {@code count}, {@code max}, and {@code delta}. always not {@code null}.
+     * @throws NullPointerException when {@code map}, or {@code closure}, or both are {@code null}.
      * @implSpec If the agent's weight is too high resulting in delta changing its sign (can't be resampled normally)
      * the agent itself is stored elsewhere and also removed from the resampling pool to avoid empty cycles. During
      * every iteration - if there is another agent fitting the description, but with smaller weight (that is still just
@@ -362,9 +370,10 @@ public class ResamplingAlignment<T> implements AlignmentUtils<T> {
      * for non-positive values, NaNs and Infinities.
      *
      * @param agents A collection of agents.
-     * @param filter A predicate object to filter the agents.
-     * @return a list of filtered agents
+     * @param filter A predicate object to filter the agents, can be {@code null}.
+     * @return a list of filtered agents or {@code null}.
      * @throws IllegalArgumentException when a weight is non-positive, Nan, or Infinity.
+     * @throws NullPointerException when {@code agents} is {@code null}.
      */
     private @Nullable List<T> alignmentSetup(final @NonNull Collection<T> agents, final @Nullable Predicate<T> filter) {
         var list = extractAgentList(agents, filter);

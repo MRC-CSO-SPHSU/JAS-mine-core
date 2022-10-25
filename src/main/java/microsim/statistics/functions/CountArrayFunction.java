@@ -16,27 +16,30 @@ public class CountArrayFunction extends AbstractArrayFunction implements DoubleS
     protected int count;
 
     /**
-     * Create a count function on an integer array source.
+     * Creates a count function on an integer array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public CountArrayFunction(final @NonNull IntArraySource source) {
         super(source);
     }
 
     /**
-     * Create a count function on a long array source.
+     * Creates a count function on a long array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public CountArrayFunction(final @NonNull LongArraySource source) {
         super(source);
     }
 
     /**
-     * Create a count function on a double array source.
+     * Creates a count function on a double array source.
      *
      * @param source The data source.
+     * @throws NullPointerException when {@code source} is {@code null}.
      */
     public CountArrayFunction(final @NonNull DoubleArraySource source) {
         super(source);

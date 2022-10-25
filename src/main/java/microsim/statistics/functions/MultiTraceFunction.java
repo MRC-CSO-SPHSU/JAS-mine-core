@@ -27,7 +27,7 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
     protected int count = 0;
 
     /**
-     * Collect a value from the source.
+     * Collects a value from the source.
      */
     public void updateSource() {
         count++;
@@ -42,24 +42,28 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
     }
 
     /**
-     * {@link microsim.event.EventListener} callback function. It supports only {@link CommonEventType#Update} event.
+     * {@link microsim.event.EventListener} callback function. It supports only {@link CommonEventType#UPDATE} event.
      *
-     * @param type The action id. Only {@link CommonEventType#Update} is supported.
-     * @throws UnsupportedOperationException If actionType is not supported.
+     * @param type The action id. Only {@link CommonEventType#UPDATE} is supported.
+     * @throws SimulationRuntimeException If actionType is not supported.
+     * @throws NullPointerException       when {@code type} is {@code null}.
      */
     public void onEvent(@NonNull Enum<?> type) {
-        if (type.equals(CommonEventType.Update)) updateSource();
+        if (type.equals(CommonEventType.UPDATE)) updateSource();
         else throw new SimulationRuntimeException("SimpleStatistics object does not support " + type + " operation.");
     }
 
     /**
-     * Compute one of the available statistical functions on the collected data.
+     * Computes one of the available statistical functions on the collected data.
+     *
+     * @throws NullPointerException          when {@code valueID} is {@code null}.
+     * @throws UnsupportedOperationException when {@code valueID} is of not supported type.
      */
     public double getDoubleValue(final @NonNull Enum<?> valueID) {
         return switch ((Variables) valueID) {
-            case Mean -> getMean();
-            case Variance -> getVariance();
-            case Count -> getCount();
+            case MEAN -> getMean();
+            case VARIANCE -> getVariance();
+            case COUNT -> getCount();
             default -> throw new UnsupportedOperationException("The valueID " + valueID + " is not supported.");
         };
     }
@@ -68,31 +72,31 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         /**
          * Return the last collected value.
          */
-        LastValue,
+        LAST_VALUE,
         /**
          * Return the minimum collected value.
          */
-        Min,
+        MIN,
         /**
          * Return the maximum collected value.
          */
-        Max,
+        MAX,
         /**
          * Return the mean of the collected values.
          */
-        Mean,
+        MEAN,
         /**
          * Return the variance of the collected values.
          */
-        Variance,
+        VARIANCE,
         /**
          * Return the number of collected values.
          */
-        Count,
+        COUNT,
         /**
          * Return the sum of collected values.
          */
-        Sum
+        SUM
     }
 
     /**
@@ -113,10 +117,11 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         private long lastRead;
 
         /**
-         * Create a basic statistic probe on a {@link DoubleSource} object.
+         * Creates a basic statistic probe on a {@link DoubleSource} object.
          *
          * @param source  The {@link LongSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Long(final @NonNull LongSource source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -124,19 +129,20 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         }
 
         /**
-         * Create a basic statistic probe on a generic object.
+         * Creates a basic statistic probe on a generic object.
          *
          * @param source        A generic source object.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Long(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
             target = new LongInvoker(source, valueName, getFromMethod);
-            valueID = LongSource.Variables.Default;
+            valueID = LongSource.Variables.DEFAULT;
         }
 
         /**
-         * Read the source values and update statistics.
+         * Reads the source values and update statistics.
          */
         public void updateSource() {
             super.updateSource();
@@ -150,18 +156,18 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         }
 
         /**
-         * Return the result of a given statistic.
+         * Returns the result of a given statistic.
          *
          * @param valueID One of the {@link MultiTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
-         * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws NullPointerException when {@code valueID} is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> valueID) {
             return switch ((MultiTraceFunction.Variables) valueID) {
-                case LastValue -> (double) lastRead;
-                case Max -> (double) max;
-                case Min -> (double) min;
-                case Sum -> (double) sum;
+                case LAST_VALUE -> (double) lastRead;
+                case MAX -> (double) max;
+                case MIN -> (double) min;
+                case SUM -> (double) sum;
                 default -> super.getDoubleValue(valueID);
             };
         }
@@ -172,16 +178,17 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
          * @param valueID One of the {@link MultiTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
          * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws NullPointerException          when {valueID} is {@code null}.
          */
         public long getLongValue(@NonNull Enum<?> valueID) {
-            if (valueID.equals(LongSource.Variables.Default))
+            if (valueID.equals(LongSource.Variables.DEFAULT))
                 return lastRead;
             return switch ((MultiTraceFunction.Variables) valueID) {
-                case LastValue -> lastRead;
-                case Max -> max;
-                case Min -> min;
-                case Count -> count;
-                case Sum -> sum;
+                case LAST_VALUE -> lastRead;
+                case MAX -> max;
+                case MIN -> min;
+                case COUNT -> count;
+                case SUM -> sum;
                 default -> throw new UnsupportedOperationException(valueID + " is not a defined function for " +
                     getClass() + ".");
             };
@@ -223,10 +230,11 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         private double lastRead;
 
         /**
-         * Create a basic statistic probe on a {@link DoubleSource} object.
+         * Creates a basic statistic probe on a {@link DoubleSource} object.
          *
          * @param source  The {@link DoubleSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Double(final @NonNull DoubleSource source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -234,19 +242,20 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         }
 
         /**
-         * Create a basic statistic probe on a generic object.
+         * Creates a basic statistic probe on a generic object.
          *
          * @param source        A generic source object.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Double(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
             target = new DoubleInvoker(source, valueName, getFromMethod);
-            valueID = DoubleSource.Variables.Default;
+            valueID = DoubleSource.Variables.DEFAULT;
         }
 
         /**
-         * Read the source values and update statistics.
+         * Reads the source values and update statistics.
          */
         public void updateSource() {
             super.updateSource();
@@ -260,20 +269,20 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         }
 
         /**
-         * Return the result of a given statistic.
+         * Returns the result of a given statistic.
          *
          * @param valueID One of the {@link MultiTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
-         * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> valueID) {
-            if (valueID.equals(DoubleSource.Variables.Default))
+            if (valueID.equals(DoubleSource.Variables.DEFAULT))
                 return lastRead;
             return switch ((MultiTraceFunction.Variables) valueID) {
-                case LastValue -> lastRead;
-                case Max -> max;
-                case Min -> min;
-                case Sum -> sum;
+                case LAST_VALUE -> lastRead;
+                case MAX -> max;
+                case MIN -> min;
+                case SUM -> sum;
                 default -> super.getDoubleValue(valueID);
             };
         }
@@ -315,10 +324,11 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         private int lastRead;
 
         /**
-         * Create a basic statistic probe on a {@link DoubleSource} object.
+         * Creates a basic statistic probe on a {@link DoubleSource} object.
          *
          * @param source  The {@link DoubleSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Integer(final @NonNull IntSource source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -326,19 +336,20 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         }
 
         /**
-         * Create a basic statistic probe on a generic object.
+         * Creates a basic statistic probe on a generic object.
          *
          * @param source        A generic source object.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Integer(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
             target = new IntegerInvoker(source, valueName, getFromMethod);
-            valueID = IntSource.Variables.Default;
+            valueID = IntSource.Variables.DEFAULT;
         }
 
         /**
-         * Read the source values and update statistics.
+         * Reads the source values and update statistics.
          */
         public void updateSource() {
             super.updateSource();
@@ -352,37 +363,38 @@ public abstract class MultiTraceFunction implements DoubleSource, UpdatableSourc
         }
 
         /**
-         * Return the result of a given statistic.
+         * Returns the result of a given statistic.
          *
          * @param valueID One of the {@link MultiTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
-         * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws NullPointerException when {@code valueID} is {@code null}.
          */
         public double getDoubleValue(final @NonNull Enum<?> valueID) {
             return switch ((MultiTraceFunction.Variables) valueID) {
-                case LastValue -> lastRead;
-                case Max -> max;
-                case Min -> min;
-                case Sum -> sum;
+                case LAST_VALUE -> lastRead;
+                case MAX -> max;
+                case MIN -> min;
+                case SUM -> sum;
                 default -> super.getDoubleValue(valueID);
             };
         }
 
         /**
-         * Return the result of a given statistic.
+         * Returns the result of a given statistic.
          *
          * @param valueID One of the {@link MultiTraceFunction.Variables} constants representing available statistics.
          * @return The computed value.
-         * @throws UnsupportedOperationException If the given valueID is not supported.
+         * @throws UnsupportedOperationException If the given {@code valueID} is not supported.
+         * @throws NullPointerException when {@code valueID} is {@code null}.
          */
         public int getIntValue(final @NonNull Enum<?> valueID) {
-            if (valueID.equals(IntSource.Variables.Default))
+            if (valueID.equals(IntSource.Variables.DEFAULT))
                 return lastRead;
             return switch ((MultiTraceFunction.Variables) valueID) {
-                case LastValue -> lastRead;
-                case Max -> max;
-                case Min -> min;
-                case Count -> count;
+                case LAST_VALUE -> lastRead;
+                case MAX -> max;
+                case MIN -> min;
+                case COUNT -> count;
                 default -> throw new UnsupportedOperationException(valueID + " is not a defined function for " +
                     getClass() + ".");
             };

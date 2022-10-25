@@ -1,12 +1,15 @@
 package microsim.event;
 
+/**
+ * A collection of system events.
+ */
 public enum SystemEventType {
-    Setup,
-    Build,
-    Start,
-    Stop,
-    Step,
-    End,
-    Restart,
-    Shutdown
+    SETUP,
+    BUILD,
+    START,
+    STOP,
+    STEP,
+    END,
+    RESTART,
+    SHUTDOWN
 }

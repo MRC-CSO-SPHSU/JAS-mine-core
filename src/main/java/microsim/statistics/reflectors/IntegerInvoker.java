@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.extern.java.Log;
 import microsim.reflection.ReflectionUtils;
 import microsim.statistics.IntSource;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +26,7 @@ public class IntegerInvoker implements IntSource {
      * @param target    It is the target object.
      * @param fieldName A string representing the name of the method to invoke.
      * @param isMethod  If true the fieldName is a method, otherwise it is a property of the object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
      */
     public IntegerInvoker(final @NonNull Object target, final @NonNull String fieldName, final boolean isMethod) {
         this.target = target;
@@ -38,6 +40,7 @@ public class IntegerInvoker implements IntSource {
      * @param target    It is the class of the target object.
      * @param fieldName A string representing the name of the method to invoke.
      * @param isMethod  If true the fieldName is a method, otherwise it is a property of the object.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
      */
     public IntegerInvoker(final @NonNull Class<?> target, final @NonNull String fieldName, final boolean isMethod) {
         this.target = null;
@@ -46,7 +49,7 @@ public class IntegerInvoker implements IntSource {
     }
 
 
-    private void buildField(final @NonNull Class<?> trgClass, final @NonNull String fieldName) {
+    private void buildField(final Class<?> trgClass, final String fieldName) {
         method = null;
         field = ReflectionUtils.searchField(trgClass, fieldName);
 
@@ -59,7 +62,7 @@ public class IntegerInvoker implements IntSource {
                 + target + " must return an int value!");
     }
 
-    private void buildMethod(final @NonNull Class<?> trgClass, final @NonNull String methodName) {
+    private void buildMethod(final Class<?> trgClass, final String methodName) {
         field = null;
         method = ReflectionUtils.searchMethod(trgClass, methodName);
 
@@ -73,10 +76,11 @@ public class IntegerInvoker implements IntSource {
     }
 
     /**
-     * Invoke the method of the target object and return its double result.
+     * Invokes the method of the target object and return its double result.
      *
      * @param target Object to be invoked.
      * @return The requested double value.
+     * @throws NullPointerException when {@code target} is {@code null}.
      */
     public int getInt(final @NonNull Object target) {
         try {
@@ -107,7 +111,7 @@ public class IntegerInvoker implements IntSource {
     }
 
     /**
-     * Invoke the method of the object passed to constructor and return its
+     * Invokes the method of the object passed to constructor and return its
      * double result.
      *
      * @return The requested double value.
@@ -122,7 +126,7 @@ public class IntegerInvoker implements IntSource {
      * @param valueID This parameter is ignored. It is put for compatibility with the {@link IntSource} interface.
      * @return The requested double value.
      */
-    public int getIntValue(final @NonNull Enum<?> valueID) {
+    public int getIntValue(final @Nullable Enum<?> valueID) {
         return getInt(target);
     }
 

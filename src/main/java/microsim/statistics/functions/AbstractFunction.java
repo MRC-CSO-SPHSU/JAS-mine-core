@@ -19,33 +19,36 @@ public abstract class AbstractFunction implements EventListener, UpdatableSource
     }
 
     /**
-     * Update the source, invoking the {@link #updateSource()} method.
+     * Updates the source, invoking the {@link #updateSource()} method.
      *
-     * @param type Accepts only the {@link CommonEventType#Update} value.
-     * @throws UnsupportedOperationException if actionId is not equal to the {@link CommonEventType#Update} value.
+     * @param type Accepts only the {@link CommonEventType#UPDATE} value.
+     * @throws SimulationRuntimeException if actionId is not equal to the {@link CommonEventType#UPDATE} value.
+     * @throws NullPointerException       when {@code type} is {@code null}.
      */
     public void onEvent(final @NonNull Enum<?> type) {
-        if (type.equals(CommonEventType.Update)) updateSource();
+        if (type.equals(CommonEventType.UPDATE)) updateSource();
         else throw new SimulationRuntimeException("The action " + type + " is not supported by an ArrayFunction");
     }
 
     /**
-     * Return the current status of the time checker. A time checker avoid the object to update more than one time per
+     * Returns the current status of the time checker. A time checker avoid the object to update more than one time per
      * simulation step. The default value is enabled (true).
      *
-     * @return True if the computer is currently checking time before update cached data, false if disabled.
+     * @return {@code true} if the computer is currently checking time before update cached data, {@code false} if
+     * disabled.
      */
     public boolean isCheckingTime() {
         return timeChecker.isEnabled();
     }
 
     /**
-     * Set the current status of the time checker. A time checker avoid the object to update more than one time per
+     * Sets the current status of the time checker. A time checker avoid the object to update more than one time per
      * simulation step. The default value is enabled (true).
      *
-     * @param b True if the computer is currently checking time before update cached data, false if disabled.
+     * @param b {@code true} if the computer is currently checking time before update cached data, {@code false} if
+     *          disabled.
      */
-    public void setCheckingTime(boolean b) {
+    public void setCheckingTime(final boolean b) {
         timeChecker.setEnabled(b);
     }
 

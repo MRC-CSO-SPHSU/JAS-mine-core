@@ -22,20 +22,19 @@ public abstract class Series implements EventListener, UpdatableSource {
     public abstract void updateSource();
 
     /**
-     * {@link EventListener} callback function. It supports only {@link CommonEventType#Update} event.
+     * {@link EventListener} callback function. It supports only {@link CommonEventType#UPDATE} event.
      *
-     * @param type The action id. Only {@link CommonEventType#Update} is supported.
+     * @param type The action id. Only {@link CommonEventType#UPDATE} is supported.
      * @throws UnsupportedOperationException If actionType is not supported.
      */
     public void onEvent(final @NonNull Enum<?> type) {
-        if (type.equals(CommonEventType.Update)) updateSource();
+        if (type.equals(CommonEventType.UPDATE)) updateSource();
         else throw new UnsupportedOperationException("The SimpleStatistics object does not support " + type +
             " operation.");
-
     }
 
     /**
-     * Return the current status of the time checker. A time checker avoid the object to update more than one time per
+     * Returns the current status of the time checker. A time checker avoid the object to update more than one time per
      * simulation step. The default value is enabled (true).
      *
      * @return True if the computer is currently checking time before update cached data, false if disabled.
@@ -45,7 +44,7 @@ public abstract class Series implements EventListener, UpdatableSource {
     }
 
     /**
-     * Set the current status of the time checker. A time checker avoid the object to update more than one time per
+     * Sets the current status of the time checker. A time checker avoid the object to update more than one time per
      * simulation step. The default value is enabled (true).
      *
      * @param b True if the computer is currently checking time before update cached data, false if disabled.
@@ -91,10 +90,11 @@ public abstract class Series implements EventListener, UpdatableSource {
         protected Enum<?> valueID;
 
         /**
-         * Create a statistic probe on a collection of {@link DoubleSource} objects.
+         * Creates a statistic probe on a collection of {@link DoubleSource} objects.
          *
          * @param source  The collection containing {@link DoubleSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Double(final @NonNull DoubleSource source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -103,26 +103,28 @@ public abstract class Series implements EventListener, UpdatableSource {
         }
 
         /**
-         * Create a statistic probe on a collection of {@link DoubleSource} objects.
-         * It uses the {@link DoubleSource.Variables#Default} variable id.
+         * Creates a statistic probe on a collection of {@link DoubleSource} objects.
+         * It uses the {@link DoubleSource.Variables#DEFAULT} variable id.
          *
          * @param source The collection containing {@link DoubleSource} object.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
-        public Double(DoubleSource source) {
+        public Double(@NonNull DoubleSource source) {
             target = source;
-            this.valueID = DoubleSource.Variables.Default;
+            this.valueID = DoubleSource.Variables.DEFAULT;
             valueList = new BufferedDoubleArrayList();
         }
 
         /**
-         * Create a basic statistic probe on a collection of objects.
+         * Creates a basic statistic probe on a collection of objects.
          *
          * @param source        A collection of generic objects.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Double(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
-            this.valueID = DoubleSource.Variables.Default;
+            this.valueID = DoubleSource.Variables.DEFAULT;
             target = new DoubleInvoker(source, valueName, getFromMethod);
             valueList = new BufferedDoubleArrayList();
         }
@@ -158,10 +160,11 @@ public abstract class Series implements EventListener, UpdatableSource {
         protected Enum<?> valueID;
 
         /**
-         * Create a statistic probe on a collection of {@link LongSource} objects.
+         * Creates a statistic probe on a collection of {@link LongSource} objects.
          *
          * @param source  The collection containing {@link LongSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Long(final @NonNull LongSource source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -170,26 +173,28 @@ public abstract class Series implements EventListener, UpdatableSource {
         }
 
         /**
-         * Create a statistic probe on a collection of {@link LongSource} objects.
-         * It uses the {@link LongSource.Variables#Default} variable id.
+         * Creates a statistic probe on a collection of {@link LongSource} objects. It uses the
+         * {@link LongSource.Variables#DEFAULT} variable id.
          *
          * @param source The collection containing {@link LongSource} object.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Long(final @NonNull LongSource source) {
             target = source;
-            this.valueID = LongSource.Variables.Default;
+            this.valueID = LongSource.Variables.DEFAULT;
             valueList = new BufferedLongArrayList();
         }
 
         /**
-         * Create a basic statistic probe on a collection of objects.
+         * Creates a basic statistic probe on a collection of objects.
          *
          * @param source        A collection of generic objects.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Long(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
-            this.valueID = LongSource.Variables.Default;
+            this.valueID = LongSource.Variables.DEFAULT;
             target = new LongInvoker(source, valueName, getFromMethod);
             valueList = new BufferedLongArrayList();
         }
@@ -229,10 +234,11 @@ public abstract class Series implements EventListener, UpdatableSource {
         protected Enum<?> valueID;
 
         /**
-         * Create a statistic probe on a collection of {@link IntSource} objects.
+         * Creates a statistic probe on a collection of {@link IntSource} objects.
          *
          * @param source  The collection containing {@link IntSource} object.
          * @param valueID The value identifier defined by source object.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Integer(final @NonNull IntSource source, final @NonNull Enum<?> valueID) {
             target = source;
@@ -241,26 +247,28 @@ public abstract class Series implements EventListener, UpdatableSource {
         }
 
         /**
-         * Create a statistic probe on a collection of {@link IntSource} objects.
-         * It uses the {@link IntSource} variable id.
+         * Creates a statistic probe on a collection of {@link IntSource} objects. It uses the {@link IntSource}
+         * variable id.
          *
          * @param source The collection containing {@link IntSource} object.
+         * @throws NullPointerException when {@code source} is {@code null}.
          */
         public Integer(final @NonNull IntSource source) {
             target = source;
-            this.valueID = IntSource.Variables.Default;
+            this.valueID = IntSource.Variables.DEFAULT;
             valueList = new BufferedIntArrayList();
         }
 
         /**
-         * Create a basic statistic probe on a collection of objects.
+         * Creates a basic statistic probe on a collection of objects.
          *
          * @param source        A collection of generic objects.
          * @param valueName     The name of the field or the method returning the variable to be probed.
          * @param getFromMethod Specifies if valueName is a method or a property value.
+         * @throws NullPointerException when any of the input parameters is {@code null}.
          */
         public Integer(final @NonNull Object source, final @NonNull String valueName, final boolean getFromMethod) {
-            this.valueID = IntSource.Variables.Default;
+            this.valueID = IntSource.Variables.DEFAULT;
             target = new IntegerInvoker(source, valueName, getFromMethod);
             valueList = new BufferedIntArrayList();
         }

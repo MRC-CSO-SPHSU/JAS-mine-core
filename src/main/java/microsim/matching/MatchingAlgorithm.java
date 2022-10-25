@@ -8,9 +8,19 @@ import java.util.Comparator;
 
 public interface MatchingAlgorithm<T> {
 
+    /**
+     * Attempts to match people from two disjoint sets.
+     *
+     * @param collection1   A set of agents.
+     * @param filter1       A filter for {@code collection1}.
+     * @param collection2   Another set of agents to match to.
+     * @param filter2       A filter for {@code collection2}.
+     * @param doubleClosure An object implementing {@link MatchingScoreClosure} that allows scoring of pairs.
+     * @param matching      An object implementing {@link MatchingClosure} to match pairs of agents.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
+     */
     void matching(final @NonNull Collection<T> collection1, final @NonNull Predicate<T> filter1,
-                  final @NonNull Comparator<T> comparator1, final @NonNull Collection<T> collection2,
-                  final @NonNull Predicate<T> filter2, final @NonNull MatchingScoreClosure<T> doubleClosure,
-                  final @NonNull MatchingClosure<T> matching);
+                  final @NonNull Collection<T> collection2, final @NonNull Predicate<T> filter2,
+                  final @NonNull MatchingScoreClosure<T> doubleClosure, final @NonNull MatchingClosure<T> matching);
 
 }

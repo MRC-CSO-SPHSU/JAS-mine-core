@@ -32,10 +32,12 @@ public class MovingAverageTraceFunction extends AbstractFunction implements Doub
     protected int valueCount = 0;
 
     /**
-     * Create a basic statistic probe on a {@link DoubleSource} object.
+     * Creates a basic statistic probe on a {@link DoubleSource} object.
      *
      * @param source  The {@link DoubleSource} object.
      * @param valueID The value identifier defined by source object.
+     * @throws NullPointerException     when any of the input parameters is {@code null}.
+     * @throws IllegalArgumentException when {@code windowSize} is {@code < 1}.
      */
     public MovingAverageTraceFunction(final @NonNull DoubleSource source, final @NonNull Enum<?> valueID,
                                       final int windowSize) {
@@ -48,10 +50,12 @@ public class MovingAverageTraceFunction extends AbstractFunction implements Doub
     }
 
     /**
-     * Create a basic statistic probe on a {@link LongSource} object.
+     * Creates a basic statistic probe on a {@link LongSource} object.
      *
      * @param source  The {@link LongSource} object.
      * @param valueID The value identifier defined by source object.
+     * @throws NullPointerException     when any of the input parameters is {@code null}.
+     * @throws IllegalArgumentException when {@code windowSize} is {@code < 1}.
      */
     public MovingAverageTraceFunction(final @NonNull LongSource source, final @NonNull Enum<?> valueID,
                                       final int windowSize) {
@@ -68,6 +72,8 @@ public class MovingAverageTraceFunction extends AbstractFunction implements Doub
      *
      * @param source  The {@link IntSource} object.
      * @param valueID The value identifier defined by source object.
+     * @throws NullPointerException     when any of the input parameters is {@code null}.
+     * @throws IllegalArgumentException when {@code windowSize} is {@code < 1}.
      */
     public MovingAverageTraceFunction(final @NonNull IntSource source, final @NonNull Enum<?> valueID,
                                       final int windowSize) {
@@ -80,7 +86,7 @@ public class MovingAverageTraceFunction extends AbstractFunction implements Doub
     }
 
     /**
-     * Collect a value from the source.
+     * Collects a value from the source.
      */
     public void applyFunction() {
         if (valueCount < len) {        //Slower calculation at startup as average is calculated directly by summing all entries in the values array
@@ -117,11 +123,11 @@ public class MovingAverageTraceFunction extends AbstractFunction implements Doub
 
 
     /**
-     * Return the result of a given statistic.
+     * Returns the result of a given statistic.
      *
      * @param valueID One of the {@link DoubleSource.Variables} constants representing available statistics.
      * @return The computed value.
-     * @throws UnsupportedOperationException If the given valueID is not supported.
+     * @throws NullPointerException when any of the input parameters is {@code null}.
      */
     public double getDoubleValue(final @NonNull Enum<?> valueID) {
         return average;
@@ -129,10 +135,13 @@ public class MovingAverageTraceFunction extends AbstractFunction implements Doub
 
     /**
      * {@inheritDoc}
+     *
+     * @throws NullPointerException       when any of the input parameters is {@code null}.
+     * @throws SimulationRuntimeException when {@code type} is of not supporter type.
      */
     @Override
     public void onEvent(final @NonNull Enum<?> type) {
-        if (type.equals(CommonEventType.Update)) updateSource();
+        if (type.equals(CommonEventType.UPDATE)) updateSource();
         else throw new SimulationRuntimeException("The SimpleStatistics object does not support " + type +
             " operation.");
     }

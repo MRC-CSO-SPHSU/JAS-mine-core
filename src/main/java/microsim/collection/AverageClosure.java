@@ -11,7 +11,7 @@ import java.util.stream.DoubleStream;
 /**
  * A generic implementation of {@link Closure}, calculates some average.
  *
- * @param <T> Some generic type
+ * @param <T> A generic agent type.
  */
 public abstract class AverageClosure<T> implements Closure<T> {
 
@@ -35,7 +35,7 @@ public abstract class AverageClosure<T> implements Closure<T> {
     }
 
     /**
-     * Adds a value to the total sum
+     * Adds a value to the total sum and increments the total number of values by {@code 1}.
      *
      * @param value The value to be added to the sum.
      */
@@ -45,8 +45,10 @@ public abstract class AverageClosure<T> implements Closure<T> {
     }
 
     /**
-     * Adds all values in the array.
+     * Adds together all values in the array and stores both the total sum and the total number of elements to date in
+     * {@link #accumulator} and {@link #count}, respectively.
      *
+     * @throws NullPointerException when {@code value} is {@code null}.
      * @see #add(double)
      */
     public void add(final double @NonNull [] value) {
@@ -55,8 +57,10 @@ public abstract class AverageClosure<T> implements Closure<T> {
     }
 
     /**
-     * Adds all values from {@link DoubleStream}.
+     * Adds all values from {@link DoubleStream} to the total sum and increments the total number by the corresponding
+     * stream length.
      *
+     * @throws NullPointerException when {@code value} is {@code null}.
      * @see #add(double)
      */
     public void add(final @NonNull DoubleStream value) {

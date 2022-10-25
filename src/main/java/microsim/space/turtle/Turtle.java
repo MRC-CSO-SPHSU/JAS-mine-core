@@ -86,14 +86,14 @@ public class Turtle extends AbstractTurtle {
      */
     public void setCardinalHeading(final @NonNull Direction directionType) {
         switch (directionType) {
-            case North -> degreeHeading = 90;
-            case NorthEast -> degreeHeading = 45;
-            case East -> degreeHeading = 0;
-            case SouthEast -> degreeHeading = 315;
-            case South -> degreeHeading = 270;
-            case SouthWest -> degreeHeading = 225;
-            case West -> degreeHeading = 180;
-            case NorthWest -> degreeHeading = 135;
+            case NORTH -> degreeHeading = 90;
+            case NORTH_EAST -> degreeHeading = 45;
+            case EAST -> degreeHeading = 0;
+            case SOUTH_EAST -> degreeHeading = 315;
+            case SOUTH -> degreeHeading = 270;
+            case SOUTH_WEST -> degreeHeading = 225;
+            case WEST -> degreeHeading = 180;
+            case NORTH_WEST -> degreeHeading = 135;
         }
 
         radiantHeading = Math.toRadians(degreeHeading);
@@ -198,9 +198,9 @@ public class Turtle extends AbstractTurtle {
         val nX = (int) Math.round(aRealX);
 
         return switch (moving) {
-            case Bounded -> grid.boundX(nX);
-            case Bounce -> grid.reflectX(nX);
-            case Torus -> grid.torusX(nX);
+            case BOUNDED -> grid.boundX(nX);
+            case BOUNCE -> grid.reflectX(nX);
+            case TORUS -> grid.torusX(nX);
         };
     }
 
@@ -208,9 +208,9 @@ public class Turtle extends AbstractTurtle {
         val nY = (int) Math.round(aRealY);
 
         return switch (moving) {
-            case Bounded -> grid.boundY(nY);
-            case Bounce -> grid.reflectY(nY);
-            case Torus -> grid.torusY(nY);
+            case BOUNDED -> grid.boundY(nY);
+            case BOUNCE -> grid.reflectY(nY);
+            case TORUS -> grid.torusY(nY);
         };
     }
 
@@ -221,19 +221,19 @@ public class Turtle extends AbstractTurtle {
         double rX = realX + steps * Math.cos(radiantHeading);
 
         switch (moving) {
-            case Bounded -> {
+            case BOUNDED -> {
                 if (rX < 0)
                     rX = 0.0;
                 if (rX > grid.getXSize())
                     rX = grid.getXSize();
             }
-            case Bounce -> {
+            case BOUNCE -> {
                 if (rX < 0)
                     rX = -rX;
                 if (rX > grid.getXSize())
                     rX = 2 * grid.getXSize() - rX;
             }
-            case Torus -> {
+            case TORUS -> {
                 while (rX < 0)
                     rX += grid.getXSize();
                 while (rX > grid.getXSize())
@@ -262,19 +262,19 @@ public class Turtle extends AbstractTurtle {
         double rY = realY + steps * Math.sin(radiantHeading);
 
         switch (moving) {
-            case Bounded -> {
+            case BOUNDED -> {
                 if (rY < 0)
                     rY = 0.0;
                 if (rY > grid.getYSize())
                     rY = grid.getYSize();
             }
-            case Bounce -> {
+            case BOUNCE -> {
                 if (rY < 0)
                     rY = -rY;
                 if (rY > grid.getYSize())
                     rY = 2 * grid.getYSize() - rY;
             }
-            case Torus -> {
+            case TORUS -> {
                 while (rY < 0)
                     rY += grid.getYSize();
                 while (rY > grid.getYSize())
